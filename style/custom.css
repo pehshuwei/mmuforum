@@ -1,0 +1,215 @@
+.no-margin
+{
+	margin: 0;
+}
+.no-border
+{
+	border: 0;
+}
+.no-padding
+{
+	padding: 0;
+}
+.no-border-radius
+{
+	border-radius: 0;
+}
+.padding-5px
+{
+	padding: 5px;
+}
+.font-size-20px
+{
+	font-size: 20px;
+}
+/*DIVISION TITLE*/
+.div-title
+{
+	font-size: 75px;
+	text-align: center;
+	color: #0C51A1;
+}
+.border-red
+{
+	border-color: #E72510;
+}
+.border-blue
+{
+	border-color: #0C51A1;
+}
+/*USER PROFILE PICTURE*/
+.profile-pic
+{
+    height: 250px;
+    width: 250px;
+}
+.font-red
+{
+    color: #E72510;
+}
+.font-blue
+{
+    color: #0C51A1;
+}
+/*jelita*/
+
+.model-r {
+    padding-left: 30px;
+    position: relative;
+    border-left: 1px dotted #cccccc;
+}
+.l{
+	text-align:center;
+	font-size: 30px;
+	color:#d9230f;
+}
+.r{
+	text-align:center;
+	font-size: 30px;
+	color:#0C51A1;
+
+}
+
+/*jelitanewpost*/
+/*HOME*/
+.facultyname{ 
+height:80px;
+text-align: center;
+font-size:20px; 
+color:white;
+background:linear-gradient(to right, #0c51a1 0%, #e72510 100%);
+
+}
+.facultyname a 
+{
+text-decoration:none;
+color:white;
+}
+
+	
+.facultyname:hover{ 
+ background-color:#E72510;
+ opacity:0.7;
+ cursor:pointer;
+}
+.homepageBackground{
+    position: absolute;
+	background-image: url("img/mmu.jpg");
+	background-repeat:no-repeat;
+	-webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+	width: 100%;
+	height: 100%;
+
+	}
+/*hoME*/
+
+/*emranshoppost*/
+
+.price{
+	color:red;
+}
+/*emranshoppost*/
+
+/*emran user approve*/
+.grid {
+  width: 750px;
+  height: 450px;
+  
+}
+#emma,#emma2 {
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#emma:hover {opacity: 0.7;}
+#emma2:hover {opacity: 0.7;}
+
+#fatah,#fatah2 {
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+#fatah:hover {opacity: 0.7;}
+#fatah2:hover {opacity: 0.7;}
+
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
+}
+
+/* Modal Content (image) */
+.modal-content {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+}
+
+/* Caption of Modal Image */
+#caption {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+    text-align: center;
+    color: #ccc;
+    padding: 10px 0;
+    height: 150px;
+}
+
+/* Add Animation */
+.modal-content, #caption {    
+    -webkit-animation-name: zoom;
+    -webkit-animation-duration: 0.6s;
+    animation-name: zoom;
+    animation-duration: 0.6s;
+}
+
+@-webkit-keyframes zoom {
+    from {-webkit-transform:scale(0)} 
+    to {-webkit-transform:scale(1)}
+}
+
+@keyframes zoom {
+    from {transform:scale(0)} 
+    to {transform:scale(1)}
+}
+
+/* The Close Button */
+.close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.close:hover,
+.close:focus {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* 100% Image Width on Smaller Screens */
+@media only screen and (max-width: 700px){
+    .modal-content {
+        width: 100%;
+    }
+}
+/*emran user approve*/
