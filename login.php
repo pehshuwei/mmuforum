@@ -57,12 +57,12 @@
 						<ul>                                                     
 							<div class="form-group">
 								<label class="control-label">USERNAME</label>
-								<input type="text" class="form-control" name="login_name" placeholder="Username"/>
+								<input type="text" class="form-control" name="login_name" placeholder="Username" required/>
 							</div>
 
 							<div class="form-group">
 								<label class="control-label">PASSWORD</label>
-								<input type="password" class="form-control" name="login_pwd" placeholder="Password"/>
+								<input type="password" class="form-control" name="login_pwd" placeholder="Password" required/>
 								<a class="pull-right">Forgot your password?</a>
 							</div>
 							
@@ -83,11 +83,11 @@
 						<form method="post" action="" id="userRegisterFrm" class="log-frm" name="userRegisterFrm">  
 							<div class="form-group">
 								<label class="control-label">NAME</label>
-								<input type="text" class="form-control" name="signup_name" placeholder="Name"/>
+								<input type="text" class="form-control" name="signup_name" id="signup_name" placeholder="Name" required/>
 							</div>
 							<div class="form-group">
 								<label class="control-label">EMAIL</label>
-								<input type="text" class="form-control" name="signup_email" placeholder="Email Id"/>
+								<input type="text" class="form-control" name="signup_email" id="signup_email" placeholder="Email" required/>
 							</div>
 
 							<div class="form-group">
@@ -104,15 +104,23 @@
 							</div>
 							<div class="form-group">
 								<label class="control-label">PASSWORD</label>
-								<input type="password" class="form-control" name="signup_pwd" placeholder="Password"/>
+								<input type="password" class="form-control" name="signup_pwd" id="signup_pwd" placeholder="Password" required/>
 							</div>
-							<div class="form-group">
+							<div class="form-group" id="signup_cpwd">
 								<label class="control-label">CONFIRM PASSWORD</label>
-								<input type="password" class="form-control" name="signup_cpwd" placeholder="Confirm Password"/>
+								<input type="password" class="form-control" name="signup_cpwd" placeholder="Confirm your password" required/>
 							</div>
+
+							<!--
 							<div class="form-group">
-								<button type="button" name="signUpBtn" class="btn btn-info active pull-right">SIGN UP</button>
+								<input type="submit" name="signUpBtn" class="btn btn-info active pull-right" value="SIGN UP">
 							</div>
+							-->
+
+							<div class="form-group">
+								<button type="button" onclick="submitSignUp()" name="signUpBtn" class="btn btn-info active pull-right">SIGN UP</button>
+							</div>
+
 						</form>
 					</div>
 				</div>
@@ -122,6 +130,35 @@
 
 	</body>
 </html>
+
+<script type="text/javascript">
+	
+	function submitSignUp()
+	{
+		if(document.getElementById("signup_pwd").value != document.getElementById("signup_cpwd").value)
+		{
+			// alert("password is different");
+			document.getElementById("signup_cpwd").className += " has-error";
+
+		}
+			
+		else
+		{
+			alert("password is correct");
+			var div = document.getElementById("signup_cpwd").closest("div");
+			div.addClass("has-success");
+		}
+
+		return true;
+		
+	}
+
+	function changeInputColour()
+	{
+
+	}
+
+</script>
 
 <?php 
 	include("dataconnection.php");
@@ -146,14 +183,12 @@
 				default : $faculty = "NONE"; break;
 			}
 
-
 			$sql1 = "insert into user(user_name, user_email, user_pwd, user_cpwd, faculty)
 					values('$user_name', '$user_email', '$user_pwd', '$user_cpwd', '$faculty')";
 			mysqli_query($conn,$sql1);
 			?>
-			<script>alert("<?php echo $user_name?> saved");</script>
+			<script>alert("Hi <?php echo $user_name?>, your sign up is successful!");</script>
 			<?php
 			mysqli_close($conn);
 		}
-
 ?>
