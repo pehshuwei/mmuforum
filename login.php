@@ -80,16 +80,18 @@
 					<div class="model-r">
 						<div class="r">Sign Up</div><br>
 
-						<form method="post" action="" id="userRegisterFrm" class="log-frm" name="userRegisterFrm">  
-							<div class="form-group">
-								<label class="control-label">NAME</label>
-								<input type="text" class="form-control" name="signup_name" id="signup_name" placeholder="Name" required/>
-							</div>
-							<div class="form-group">
-								<label class="control-label">EMAIL</label>
-								<input type="text" class="form-control" name="signup_email" id="signup_email" placeholder="Email" required/>
-							</div>
+						<form method="post" action="" id="signUpForm" class="log-frm" name="signUpForm">  
 
+							<div class="form-group" id="signup_name">
+								<label class="control-label">NAME</label>
+								<input type="text" class="form-control" name="signup_name" id="signup_name_input" placeholder="Name" required/>
+								<span id="signup_name_error" class="help-block"></span>
+							</div>
+							<div class="form-group" id="signup_email">
+								<label class="control-label">EMAIL</label>
+								<input type="text" class="form-control" name="signup_email" id="signup_email_input" placeholder="Email" required/>
+								<span id="signup_email_error" class="help-block"></span>
+							</div>
 							<div class="form-group">
 								<label class="control-label">FACULTY</label>
 								<select class="form-control" name="signup_faculty">
@@ -102,13 +104,15 @@
 									<option value="6">CDP</option>
 								</select>
 							</div>
-							<div class="form-group">
+							<div class="form-group" id="signup_pwd">
 								<label class="control-label">PASSWORD</label>
-								<input type="password" class="form-control" name="signup_pwd" id="signup_pwd" placeholder="Password" required/>
+								<input type="password" class="form-control" name="signup_pwd" id="signup_pwd_input" placeholder="Password" required/>
+								<span id="signup_pwd_error" class="help-block"></span>
 							</div>
 							<div class="form-group" id="signup_cpwd">
 								<label class="control-label">CONFIRM PASSWORD</label>
-								<input type="password" class="form-control" name="signup_cpwd" placeholder="Confirm your password" required/>
+								<input type="password" class="form-control" name="signup_cpwd" id="signup_cpwd_input" placeholder="Confirm your password" required/>
+								<span id="signup_cpwd_error" class="help-block"></span>
 							</div>
 
 							<!--
@@ -135,27 +139,64 @@
 	
 	function submitSignUp()
 	{
-		if(document.getElementById("signup_pwd").value != document.getElementById("signup_cpwd").value)
-		{
-			// alert("password is different");
-			document.getElementById("signup_cpwd").className += " has-error";
+		var name = document.getElementById("signup_name_input").value;
+		var emailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;  
+		var passwordformat = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
 
+		//check name
+		if(name.length<6 || name.length>20)  
+		{
+			document.getElementById("signup_name").className += " has-error";
+			document.getElementById("signup_name_error").innerHTML = "Must be 6 to 20 characters";
+			return false;
 		}
-			
+		else  
+		{
+			document.getElementById("signup_name").className = "form-group";
+			document.getElementById("signup_name_error").innerHTML = " ";
+		}
+
+		//check email
+		if(document.getElementById("signup_email_input").value.match(emailformat))  
+		{
+			document.getElementById("signup_email").className = "form-group";
+			document.getElementById("signup_email_error").innerHTML = " ";
+		}
+		else  
+		{
+			document.getElementById("signup_email").className += " has-error";
+			document.getElementById("signup_email_error").innerHTML = "You have entered an invalid email address!";
+			return false;
+		}
+
+		//check password
+		if(document.getElementById("signup_pwd_input").value.match(passwordformat))
+		{
+			document.getElementById("signup_pwd").className = "form-group";
+			document.getElementById("signup_pwd_error").innerHTML = " ";
+		}  
+		else  
+		{   
+			document.getElementById("signup_pwd").className += " has-error";
+			document.getElementById("signup_pwd_error").innerHTML = "Must be 6 to 16 characters which contain at least one numeric digit, one uppercase and one lowercase letter";
+			return false;
+		}  
+
+		//check confirm password
+		if(document.getElementById("signup_pwd_input").value != document.getElementById("signup_cpwd_input").value)
+		{
+			document.getElementById("signup_cpwd").className += " has-error";
+			document.getElementById("signup_cpwd_error").innerHTML = "Please make sure your passwords match.";
+			return false;
+		}	
 		else
 		{
-			alert("password is correct");
-			var div = document.getElementById("signup_cpwd").closest("div");
-			div.addClass("has-success");
+			document.getElementById("signup_cpwd").className = "form-group";
+			document.getElementById("signup_cpwd_error").innerHTML = " ";
 		}
 
-		return true;
-		
-	}
 
-	function changeInputColour()
-	{
-
+		document.signUpForm.submit();
 	}
 
 </script>
