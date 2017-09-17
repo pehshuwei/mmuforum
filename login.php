@@ -1,4 +1,78 @@
 <!DOCTYPE html> 
+<?php 
+	include("dataconnection.php");
+
+	$error = "";
+
+	//SIGN UP
+	if(isset($_POST["signUpBtn"]))
+	{
+		$user_name = $_POST["signup_name"];
+		$user_email = $_POST["signup_email"];
+		$user_pwd = $_POST["signup_pwd"];
+		$user_cpwd = $_POST["signup_cpwd"];
+		$signup_faculty = $_POST["signup_faculty"];
+
+		switch($signup_faculty)
+		{
+			case '0': $faculty = "NONE"; break;
+			case '1': $faculty = "Faculty of Management"; break;
+			case '2': $faculty = "Faculty of Engineering"; break; 
+			case '3': $faculty = "Facutly of Creative Multimedia"; break;
+			case '4': $faculty = "Faculty of Computing and Informatics"; break;
+			case '5': $faculty = "Faculty of Applied Communication"; break;
+			case '6': $faculty = "Centre of Diploma"; break;
+			default : $faculty = "NONE"; break;
+		}
+
+		$sql_checkemail = "select * from user where user_email = '$user_email'";
+		$check_email = mysqli_query($conn,$sql_checkemail);
+
+
+		if ($row=mysqli_fetch_assoc($check_email)) 
+		{
+			$error = "Email already exists.";
+			$user_email = "";
+		}
+		else
+		{
+			$sql_signUpInsert = "insert into user(user_name, user_email, user_pwd, user_cpwd, faculty)
+					values('$user_name', '$user_email', '$user_pwd', '$user_cpwd', '$faculty')";
+			mysqli_query($conn,$sql_signUpInsert);
+			?>
+			<script>alert("Hi <?php echo $user_name?>, your sign up is successful!");</script>
+			<?php
+			mysqli_close($conn);			
+			header("Location: http://www.example.com/");	
+		}			
+	}
+
+	//LOGIN
+	if(isset($_POST["loginBtn"]))
+	{
+		$user_name = $_POST["login_name"];
+		$user_pwd = $_POST["login_pwd"];
+
+		$sql3 = "select * from user where user_name = '$user_name' and user_pwd = '$user_pwd'";
+
+		$check_user = mysqli_query($conn,$sql3);
+		if($row=mysqli_fetch_assoc($check_user))
+		{
+			$_SESSION["user_name"]=$row["user_name"];
+			$user_pwd = $row["user_pwd"];
+			header("Location: http://www.example.com/");	
+		}
+		else
+		{
+		?>
+			<script type = "text/javascript">
+			alert("Invalid Username or Password");
+			</script>
+		<?php
+		}
+	}
+?>
+
 <html>
 	<head>
 		<title>
@@ -41,56 +115,52 @@
 						    </form>
 						</li>
 						<li><button type="submit" class="btn btn-default">Search</button></li>-->
-						<li><a href="home.html" >HOME</a></li>
+						<li><a href="home.html">HOME</a></li>
 					</ul>
 				</div>
 			</div>
 		</nav>
-		<br>
-		<br>
-		<div class="container">
+		<div class="container" style="margin-top:50px;">
 
+			<!-- LOGIN -->
 			<div class="col-md-6 col-sm-6 no-padng">   
 				<div class="model-l">
 					<div class="l">Login</div><br>                  
-					<form method="post" id="logFrm" class="log-frm" name="logFrm"> 
+					<form method="post" action="" id="loginForm" class="log-frm" name="loginForm"> 
 						<ul>                                                     
-							<div class="form-group">
-								<label class="control-label">USERNAME</label>
-								<input type="text" class="form-control" name="login_name" placeholder="Username" required/>
+							<div class="form-group" id="login_name">
+								<label class="control-label">EMAIL</label>
+								<input type="email" class="form-control" name="login_name" id="login_name_input" placeholder="Email" required/>
 							</div>
 
 							<div class="form-group">
-								<label class="control-label">PASSWORD</label>
-								<input type="password" class="form-control" name="login_pwd" placeholder="Password" required/>
-								<a class="pull-right">Forgot your password?</a>
+								<label class="control-label" id="login_pwd">PASSWORD</label>
+								<input type="password" class="form-control" name="login_pwd" id="login_name_input" placeholder="Password" required/>
 							</div>
 							
 							<div class="form-group">
-								<br><button type="button" name="logBtn" class="btn btn-primary active pull-right">LOGIN</button>
+								<br><input type="submit" name="loginBtn" value="LOGIN" class="btn btn-primary active pull-right"/>
 							</div>
-
-
-
-
 						</form>
 					</div>
 				</div>    
+
+				<!-- SIGN UP -->
 				<div class="col-md-6 col-sm-6 no-padng">
 					<div class="model-r">
 						<div class="r">Sign Up</div><br>
 
-						<form method="post" action="" id="signUpForm" class="log-frm" name="signUpForm">  
+						<form method="post" action="" id="signUpForm" class="log-frm" name="signUpForm" onsubmit="return signUpFormValidation()">  
 
 							<div class="form-group" id="signup_name">
 								<label class="control-label">NAME</label>
-								<input type="text" class="form-control" name="signup_name" id="signup_name_input" placeholder="Name" required/>
+								<input type="text" class="form-control" name="signup_name" id="signup_name_input" placeholder="Name" value="<?php echo isset($user_name)?$user_name:""; ?>" required/>
 								<span id="signup_name_error" class="help-block"></span>
 							</div>
-							<div class="form-group" id="signup_email">
+							<div class="form-group <?php if($error){echo 'has-error';}?>" id="signup_email">
 								<label class="control-label">EMAIL</label>
-								<input type="text" class="form-control" name="signup_email" id="signup_email_input" placeholder="Email" required/>
-								<span id="signup_email_error" class="help-block"></span>
+								<input type="email" class="form-control" name="signup_email" id="signup_email_input" placeholder="Email" value="<?php echo isset($user_email)?$user_email:""; ?>"  required/>
+								<span id="signup_email_error" class="help-block"><?php echo $error; ?></span>
 							</div>
 							<div class="form-group">
 								<label class="control-label">FACULTY</label>
@@ -115,14 +185,8 @@
 								<span id="signup_cpwd_error" class="help-block"></span>
 							</div>
 
-							<!--
 							<div class="form-group">
-								<input type="submit" name="signUpBtn" class="btn btn-info active pull-right" value="SIGN UP">
-							</div>
-							-->
-
-							<div class="form-group">
-								<button type="button" onclick="submitSignUp()" name="signUpBtn" class="btn btn-info active pull-right">SIGN UP</button>
+								<input type="submit" name="signUpBtn" value="SIGN UP" class="btn btn-info active pull-right"/>
 							</div>
 
 						</form>
@@ -136,8 +200,8 @@
 </html>
 
 <script type="text/javascript">
-	
-	function submitSignUp()
+
+	function signUpFormValidation()
 	{
 		var name = document.getElementById("signup_name_input").value;
 		var emailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;  
@@ -145,91 +209,56 @@
 
 		//check name
 		if(name.length<6 || name.length>20)  
-		{
+		{ 	
 			document.getElementById("signup_name").className += " has-error";
 			document.getElementById("signup_name_error").innerHTML = "Must be 6 to 20 characters";
 			return false;
-		}
-		else  
+		}//check email
+		else if(emailformat.test(document.getElementById("signup_email_input").value) == false)  
 		{
 			document.getElementById("signup_name").className = "form-group";
 			document.getElementById("signup_name_error").innerHTML = " ";
-		}
-
-		//check email
-		if(document.getElementById("signup_email_input").value.match(emailformat))  
-		{
-			document.getElementById("signup_email").className = "form-group";
-			document.getElementById("signup_email_error").innerHTML = " ";
-		}
-		else  
-		{
 			document.getElementById("signup_email").className += " has-error";
 			document.getElementById("signup_email_error").innerHTML = "You have entered an invalid email address!";
 			return false;
-		}
-
-		//check password
-		if(document.getElementById("signup_pwd_input").value.match(passwordformat))
+		}//check password
+		else if(passwordformat.test(document.getElementById("signup_pwd_input").value) == false)
 		{
-			document.getElementById("signup_pwd").className = "form-group";
-			document.getElementById("signup_pwd_error").innerHTML = " ";
-		}  
-		else  
-		{   
+			document.getElementById("signup_name").className = "form-group";
+			document.getElementById("signup_name_error").innerHTML = " ";
+			document.getElementById("signup_email").className = "form-group";
+			document.getElementById("signup_email_error").innerHTML = " ";
 			document.getElementById("signup_pwd").className += " has-error";
 			document.getElementById("signup_pwd_error").innerHTML = "Must be 6 to 16 characters which contain at least one numeric digit, one uppercase and one lowercase letter";
 			return false;
-		}  
-
-		//check confirm password
-		if(document.getElementById("signup_pwd_input").value != document.getElementById("signup_cpwd_input").value)
+		}//check confirm password
+		else if(document.getElementById("signup_pwd_input").value != document.getElementById("signup_cpwd_input").value)
 		{
+			document.getElementById("signup_name").className = "form-group";
+			document.getElementById("signup_name_error").innerHTML = " ";
+			document.getElementById("signup_email").className = "form-group";
+			document.getElementById("signup_email_error").innerHTML = " ";
+			document.getElementById("signup_pwd").className = "form-group";
+			document.getElementById("signup_pwd_error").innerHTML = " ";
 			document.getElementById("signup_cpwd").className += " has-error";
 			document.getElementById("signup_cpwd_error").innerHTML = "Please make sure your passwords match.";
 			return false;
 		}	
 		else
 		{
+			document.getElementById("signup_name").className = "form-group";
+			document.getElementById("signup_name_error").innerHTML = " ";
+			document.getElementById("signup_email").className = "form-group";
+			document.getElementById("signup_email_error").innerHTML = " ";
+			document.getElementById("signup_pwd").className = "form-group";
+			document.getElementById("signup_pwd_error").innerHTML = " ";
 			document.getElementById("signup_cpwd").className = "form-group";
 			document.getElementById("signup_cpwd_error").innerHTML = " ";
+			return true;
 		}
 
-
-		document.signUpForm.submit();
 	}
-
+	
 </script>
 
-<?php 
-	include("dataconnection.php");
 
-	if(isset($_POST["signUpBtn"]))
-		{
-			$user_name = $_POST["signup_name"];
-			$user_email = $_POST["signup_email"];
-			$user_pwd = $_POST["signup_pwd"];
-			$user_cpwd = $_POST["signup_cpwd"];
-			$signup_faculty = $_POST["signup_faculty"];
-
-			switch($signup_faculty)
-			{
-				case '0': $faculty = "NONE"; break;
-				case '1': $faculty = "Faculty of Management"; break;
-				case '2': $faculty = "Faculty of Engineering"; break; 
-				case '3': $faculty = "Facutly of Creative Multimedia"; break;
-				case '4': $faculty = "Faculty of Computing and Informatics"; break;
-				case '5': $faculty = "Faculty of Applied Communication"; break;
-				case '6': $faculty = "Centre of Diploma"; break;
-				default : $faculty = "NONE"; break;
-			}
-
-			$sql1 = "insert into user(user_name, user_email, user_pwd, user_cpwd, faculty)
-					values('$user_name', '$user_email', '$user_pwd', '$user_cpwd', '$faculty')";
-			mysqli_query($conn,$sql1);
-			?>
-			<script>alert("Hi <?php echo $user_name?>, your sign up is successful!");</script>
-			<?php
-			mysqli_close($conn);
-		}
-?>
