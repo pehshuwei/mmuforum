@@ -1,117 +1,115 @@
 <!DOCTYPE html> 
 <?php 
-	include("dataconnection.php");
+include("dataconnection.php");
 
-	$error = "";
-	$login_error = "";
+$error = "";
+$login_error = "";
 
-	if (isset($_SESSION['authenticated'])){
-        header("Location: http://www.example.com/");   
-    }
-    else
-    {
-    	//SIGN UP
-		if(isset($_POST["signUpBtn"]))
+if(isset($_SESSION['authenticated'])){
+	header("Location: home.php");   
+}
+else
+{
+    //SIGN UP
+	if(isset($_POST["signUpBtn"]))
+	{
+		$user_name = $_POST["signup_name"];
+		$user_email = $_POST["signup_email"];
+		$user_pwd = $_POST["signup_pwd"];
+		$user_cpwd = $_POST["signup_cpwd"];
+		$signup_faculty = $_POST["signup_faculty"];
+
+		switch($signup_faculty)
 		{
-			$user_name = $_POST["signup_name"];
-			$user_email = $_POST["signup_email"];
-			$user_pwd = $_POST["signup_pwd"];
-			$user_cpwd = $_POST["signup_cpwd"];
-			$signup_faculty = $_POST["signup_faculty"];
-
-			switch($signup_faculty)
-			{
-				case '0': $faculty = "NONE"; break;
-				case '1': $faculty = "Faculty of Management"; break;
-				case '2': $faculty = "Faculty of Engineering"; break; 
-				case '3': $faculty = "Facutly of Creative Multimedia"; break;
-				case '4': $faculty = "Faculty of Computing and Informatics"; break;
-				case '5': $faculty = "Faculty of Applied Communication"; break;
-				case '6': $faculty = "Centre of Diploma"; break;
-				default : $faculty = "NONE"; break;
-			}
-
-			$sql_checkemail = "select * from user where user_email = '$user_email'";
-			$check_email = mysqli_query($conn,$sql_checkemail);
-
-
-			if ($row=mysqli_fetch_assoc($check_email)) 
-			{
-				$error = "Email already exists.";
-				$user_email = "";
-			}
-			else
-			{
-				$sql_signUpInsert = "insert into user(user_name, user_email, user_pwd, user_cpwd, faculty)
-						values('$user_name', '$user_email', '$user_pwd', '$user_cpwd', '$faculty')";
-				mysqli_query($conn,$sql_signUpInsert);
-				?>
-				<script>alert("Hi <?php echo $user_name?>, your sign up is successful!");</script>
-				<?php
-				mysqli_close($conn);			
-				header("Location: http://www.example.com/");	
-			}			
+			case '0': $faculty = "NONE"; break;
+			case '1': $faculty = "Faculty of Management"; break;
+			case '2': $faculty = "Faculty of Engineering"; break; 
+			case '3': $faculty = "Facutly of Creative Multimedia"; break;
+			case '4': $faculty = "Faculty of Computing and Informatics"; break;
+			case '5': $faculty = "Faculty of Applied Communication"; break;
+			case '6': $faculty = "Centre of Diploma"; break;
+			default : $faculty = "NONE"; break;
 		}
 
-		//LOGIN
-		if(isset($_POST["loginBtn"]))
+		$sql_checkemail = "select * from user where user_email = '$user_email'";
+		$check_email = mysqli_query($conn,$sql_checkemail);
+
+
+		if ($row=mysqli_fetch_assoc($check_email)) 
 		{
-			$user_email = $_POST["login_email"];
-			$user_pwd = $_POST["login_pwd"];
-
-			$sql_loginCheck = "select * from user where user_email = '$user_email' and user_pwd = '$user_pwd'";
-
-			$check_user = mysqli_query($conn,$sql_loginCheck);
-			if($row=mysqli_fetch_assoc($check_user))
-			{
-				$_SESSION["user_email"]=$row["user_name"];
-				$_SESSION['authenticated'] = true;
-				header("Location: http://www.example.com/");	
-			}
-			else
-			{
-				$login_error = "Invalid username or password.";
-			}
+			$error = "Email already exists.";
+			$user_email = "";
 		}
-    }
+		else
+		{
+			$sql_signUpInsert = "insert into user(user_name, user_email, user_pwd, user_cpwd, faculty)
+			values('$user_name', '$user_email', '$user_pwd', '$user_cpwd', '$faculty')";
+			mysqli_query($conn,$sql_signUpInsert);
+			mysqli_close($conn);
+			$_SESSION['signUpSuccess'] = true;
+			header("Location: login.php");	
+		}			
+	}
+
+	//LOGIN
+	if(isset($_POST["loginBtn"]))
+	{
+		$user_email = $_POST["login_email"];
+		$user_pwd = $_POST["login_pwd"];
+
+		$sql_loginCheck = "select * from user where user_email = '$user_email' and user_pwd = '$user_pwd'";
+
+		$check_user = mysqli_query($conn,$sql_loginCheck);
+		if($row=mysqli_fetch_assoc($check_user))
+		{
+			$_SESSION["user_email"]=$row["user_email"];
+			$_SESSION['authenticated'] = true;
+			header("Location: home.php");	
+		}
+		else
+		{
+			$login_error = "Invalid username or password.";
+		}
+	}
+}
 ?>
 
 <html>
-	<head>
-		<title>
-			LOGIN | MMU FORUM
-		</title>
+<head>
+	<title>
+		LOGIN | MMU FORUM
+	</title>
 
-		<meta charset="utf-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="stylesheet" type="text/css" href="style/FYP_bootstrap.css"/>
-		<link rel="stylesheet" type="text/css" href="style/custom.css"/>
-		
-	</head>
-	<body>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="style/FYP_bootstrap.css"/>
+	<link rel="stylesheet" type="text/css" href="style/custom.css"/>
 
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-		<script src="js/bootstrap_js.js"></script>
+</head>
+<body>
 
-		<!-- upheader ==================== -->
-		<nav class="navbar navbar-default no-margin padding-5px">
-			<div class="container-fluid">
-				<!-- logo ==================== -->
-				<div class="navbar-header col-md-8 col-sm-5 col-xs-5">
-					<a class="navbar-brand"> 
-						<a href="home.html">
-							<img src="img/mmulogo.png" height="40px" name="Home" alt="Home"/>
-						</a>
-						<span class="font-size-20px">F<small>ORUM</small></span>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src="js/bootstrap_js.js"></script>
+
+	<!-- upheader ==================== -->
+	<nav class="navbar navbar-default no-margin padding-5px">
+		<div class="container-fluid">
+			<!-- logo ==================== -->
+			<div class="navbar-header col-md-8 col-sm-5 col-xs-5">
+				<a class="navbar-brand"> 
+					<a href="home.html">
+						<img src="img/mmulogo.png" height="40px" name="Home" alt="Home"/>
 					</a>
-				</div>				
+					<span class="font-size-20px">F<small>ORUM</small></span>
+				</a>
+			</div>				
 
-				<!-- search and navigate ====================-->
-				<div class=" nav navbar-nav navbar-right col-md-1 col-sm-7 col-xs-7" >
-					<ul class="nav nav-pills">
-						<li>
-				    <!--<form class="navbar-form no-margin no-border no-padding" role="search" >
+			<!-- search and navigate ====================-->
+			<div class=" nav navbar-nav navbar-right col-md-1 col-sm-7 col-xs-7" >
+				<ul class="nav nav-pills">
+					<!--<li>
+					    <form class="navbar-form no-margin no-border no-padding" role="search" >
 							    <div class="form-group">
 							        <input type="text" class="form-control" placeholder="Search">
 							    </div>
@@ -124,6 +122,10 @@
 			</div>
 		</nav>
 		<div class="container" style="margin-top:50px;">
+
+			<div class="row">
+				<P class="signUpSuccess"><?php if(isset($_SESSION['signUpSuccess'])){ echo 'Your sign up is successful! Login now!'; } ?></P>
+			</div>
 
 			<!-- LOGIN -->
 			<div class="col-md-6 col-sm-6 no-padng">   
@@ -203,16 +205,16 @@
 
 			<script data-align="right" data-overlay="false" id="keyreply-script" src="//keyreply.com/chat/widget.js" data-color="#E4392B" data-apps="JTdCJTIyZmFjZWJvb2slMjI6JTIyMTAwMDAwMzU0Njc5MjA0JTIyLCUyMmVtYWlsJTIyOiUyMnNodXdlaS5wZWhAZ21haWwuY29tJTIyJTdE"></script>
 
-	</body>
-</html>
+		</body>
+		</html>
 
-<script type="text/javascript">
+		<script type="text/javascript">
 
-	function signUpFormValidation()
-	{
-		var name = document.getElementById("signup_name_input").value;
-		var emailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;  
-		var passwordformat = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
+			function signUpFormValidation()
+			{
+				var name = document.getElementById("signup_name_input").value;
+				var emailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;  
+				var passwordformat = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
 
 		//check name
 		if(name.length<6 || name.length>20)  
