@@ -3,74 +3,77 @@
 	include("dataconnection.php");
 
 	$error = "";
+	$login_error = "";
 
-	//SIGN UP
-	if(isset($_POST["signUpBtn"]))
-	{
-		$user_name = $_POST["signup_name"];
-		$user_email = $_POST["signup_email"];
-		$user_pwd = $_POST["signup_pwd"];
-		$user_cpwd = $_POST["signup_cpwd"];
-		$signup_faculty = $_POST["signup_faculty"];
-
-		switch($signup_faculty)
+	if (isset($_SESSION['authenticated'])){
+        header("Location: http://www.example.com/");   
+    }
+    else
+    {
+    	//SIGN UP
+		if(isset($_POST["signUpBtn"]))
 		{
-			case '0': $faculty = "NONE"; break;
-			case '1': $faculty = "Faculty of Management"; break;
-			case '2': $faculty = "Faculty of Engineering"; break; 
-			case '3': $faculty = "Facutly of Creative Multimedia"; break;
-			case '4': $faculty = "Faculty of Computing and Informatics"; break;
-			case '5': $faculty = "Faculty of Applied Communication"; break;
-			case '6': $faculty = "Centre of Diploma"; break;
-			default : $faculty = "NONE"; break;
+			$user_name = $_POST["signup_name"];
+			$user_email = $_POST["signup_email"];
+			$user_pwd = $_POST["signup_pwd"];
+			$user_cpwd = $_POST["signup_cpwd"];
+			$signup_faculty = $_POST["signup_faculty"];
+
+			switch($signup_faculty)
+			{
+				case '0': $faculty = "NONE"; break;
+				case '1': $faculty = "Faculty of Management"; break;
+				case '2': $faculty = "Faculty of Engineering"; break; 
+				case '3': $faculty = "Facutly of Creative Multimedia"; break;
+				case '4': $faculty = "Faculty of Computing and Informatics"; break;
+				case '5': $faculty = "Faculty of Applied Communication"; break;
+				case '6': $faculty = "Centre of Diploma"; break;
+				default : $faculty = "NONE"; break;
+			}
+
+			$sql_checkemail = "select * from user where user_email = '$user_email'";
+			$check_email = mysqli_query($conn,$sql_checkemail);
+
+
+			if ($row=mysqli_fetch_assoc($check_email)) 
+			{
+				$error = "Email already exists.";
+				$user_email = "";
+			}
+			else
+			{
+				$sql_signUpInsert = "insert into user(user_name, user_email, user_pwd, user_cpwd, faculty)
+						values('$user_name', '$user_email', '$user_pwd', '$user_cpwd', '$faculty')";
+				mysqli_query($conn,$sql_signUpInsert);
+				?>
+				<script>alert("Hi <?php echo $user_name?>, your sign up is successful!");</script>
+				<?php
+				mysqli_close($conn);			
+				header("Location: http://www.example.com/");	
+			}			
 		}
 
-		$sql_checkemail = "select * from user where user_email = '$user_email'";
-		$check_email = mysqli_query($conn,$sql_checkemail);
-
-
-		if ($row=mysqli_fetch_assoc($check_email)) 
+		//LOGIN
+		if(isset($_POST["loginBtn"]))
 		{
-			$error = "Email already exists.";
-			$user_email = "";
+			$user_email = $_POST["login_email"];
+			$user_pwd = $_POST["login_pwd"];
+
+			$sql_loginCheck = "select * from user where user_email = '$user_email' and user_pwd = '$user_pwd'";
+
+			$check_user = mysqli_query($conn,$sql_loginCheck);
+			if($row=mysqli_fetch_assoc($check_user))
+			{
+				$_SESSION["user_email"]=$row["user_name"];
+				$_SESSION['authenticated'] = true;
+				header("Location: http://www.example.com/");	
+			}
+			else
+			{
+				$login_error = "Invalid username or password.";
+			}
 		}
-		else
-		{
-			$sql_signUpInsert = "insert into user(user_name, user_email, user_pwd, user_cpwd, faculty)
-					values('$user_name', '$user_email', '$user_pwd', '$user_cpwd', '$faculty')";
-			mysqli_query($conn,$sql_signUpInsert);
-			?>
-			<script>alert("Hi <?php echo $user_name?>, your sign up is successful!");</script>
-			<?php
-			mysqli_close($conn);			
-			header("Location: http://www.example.com/");	
-		}			
-	}
-
-	//LOGIN
-	if(isset($_POST["loginBtn"]))
-	{
-		$user_name = $_POST["login_name"];
-		$user_pwd = $_POST["login_pwd"];
-
-		$sql3 = "select * from user where user_name = '$user_name' and user_pwd = '$user_pwd'";
-
-		$check_user = mysqli_query($conn,$sql3);
-		if($row=mysqli_fetch_assoc($check_user))
-		{
-			$_SESSION["user_name"]=$row["user_name"];
-			$user_pwd = $row["user_pwd"];
-			header("Location: http://www.example.com/");	
-		}
-		else
-		{
-		?>
-			<script type = "text/javascript">
-			alert("Invalid Username or Password");
-			</script>
-		<?php
-		}
-	}
+    }
 ?>
 
 <html>
@@ -128,16 +131,20 @@
 					<div class="l">Login</div><br>                  
 					<form method="post" action="" id="loginForm" class="log-frm" name="loginForm"> 
 						<ul>                                                     
-							<div class="form-group" id="login_name">
+							<div class="form-group <?php if($login_error){echo 'has-error';}?>" id="login_email">
 								<label class="control-label">EMAIL</label>
-								<input type="email" class="form-control" name="login_name" id="login_name_input" placeholder="Email" required/>
+								<input type="email" class="form-control" name="login_email" id="login_email_input" placeholder="Email" required/>
 							</div>
 
-							<div class="form-group">
+							<div class="form-group <?php if($login_error){echo 'has-error';}?>">
 								<label class="control-label" id="login_pwd">PASSWORD</label>
 								<input type="password" class="form-control" name="login_pwd" id="login_name_input" placeholder="Password" required/>
 							</div>
-							
+
+							<div class="form-group <?php if($login_error){echo 'has-error';}?>">
+								<span class="help-block"><?php echo $login_error; ?></span>
+							</div>
+
 							<div class="form-group">
 								<br><input type="submit" name="loginBtn" value="LOGIN" class="btn btn-primary active pull-right"/>
 							</div>
