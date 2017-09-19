@@ -22,6 +22,16 @@
 {
 	font-size: 20px;
 }
+.indent
+{
+    margin-left: 5em;
+}
+.form-control[disabled],
+.form-control[readonly],
+fieldset[disabled] .form-control {
+  background-color: #ffffff;
+  opacity: 1;
+}
 /*DIVISION TITLE*/
 .div-title
 {

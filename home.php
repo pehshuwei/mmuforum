@@ -37,28 +37,27 @@
 			<!-- logo ==================== -->
 			<div class="navbar-header col-md-8 col-sm-5 col-xs-5">
 				<a class="navbar-brand"> 
-					<a href="home.html">
+					<a href="home.php">
 						<img src="img/mmulogo.png" height="40px" name="Home" alt="Home"/>
 					</a>
 					<span class="font-size-20px">F<small>ORUM</small></span>
 				</a>
 			</div>				
 
-			<!-- search and navigate ====================-->
+			<!-- navigate ====================-->
 			<div class=" nav navbar-nav navbar-right col-md-1 col-sm-7 col-xs-7" >
 				<ul class="nav nav-pills">
 					<li>
 					<?php
 						if (isset($_SESSION['authenticated']))
 						{
-							echo '<a href="profileEdit.php">PROFILE</a>'; 
+							echo '<a href="profile.php?user_id='.$_SESSION['user_id'].'">PROFILE</a>';
 						}
 						else
 						{
 							echo '<a href="login.php">LOGIN</a>';
 						}
-					?>
-					
+					?>					
 					</li>
 				</ul>
 			</div>

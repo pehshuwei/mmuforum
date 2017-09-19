@@ -42,9 +42,10 @@ else
 		}
 		else
 		{
-			$sql_signUpInsert = "insert into user(user_name, user_email, user_pwd, user_cpwd, faculty)
-			values('$user_name', '$user_email', '$user_pwd', '$user_cpwd', '$faculty')";
-			mysqli_query($conn,$sql_signUpInsert);
+			$user_status = 'VISITOR';
+			$sql_insertsignup = "insert into user(user_name, user_email, user_pwd, user_cpwd, faculty, user_status)
+			values('$user_name', '$user_email', '$user_pwd', '$user_cpwd', '$faculty', '$user_status')";
+			mysqli_query($conn,$sql_insertsignup);
 			mysqli_close($conn);
 			$_SESSION['signUpSuccess'] = true;
 			header("Location: login.php");	
@@ -62,7 +63,7 @@ else
 		$check_user = mysqli_query($conn,$sql_loginCheck);
 		if($row=mysqli_fetch_assoc($check_user))
 		{
-			$_SESSION["user_email"]=$row["user_email"];
+			$_SESSION['user_id'] = $row['user_id'];
 			$_SESSION['authenticated'] = true;
 			header("Location: home.php");	
 		}
@@ -98,123 +99,115 @@ else
 			<!-- logo ==================== -->
 			<div class="navbar-header col-md-8 col-sm-5 col-xs-5">
 				<a class="navbar-brand"> 
-					<a href="home.html">
+					<a href="home.php">
 						<img src="img/mmulogo.png" height="40px" name="Home" alt="Home"/>
 					</a>
 					<span class="font-size-20px">F<small>ORUM</small></span>
 				</a>
 			</div>				
 
-			<!-- search and navigate ====================-->
+			<!-- and navigate ====================-->
 			<div class=" nav navbar-nav navbar-right col-md-1 col-sm-7 col-xs-7" >
 				<ul class="nav nav-pills">
-					<!--<li>
-					    <form class="navbar-form no-margin no-border no-padding" role="search" >
-							    <div class="form-group">
-							        <input type="text" class="form-control" placeholder="Search">
-							    </div>
-						    </form>
-						</li>
-						<li><button type="submit" class="btn btn-default">Search</button></li>-->
-						<li><a href="home.html">HOME</a></li>
-					</ul>
-				</div>
+					<li><a href="home.html">HOME</a></li>
+				</ul>
 			</div>
-		</nav>
-		<div class="container" style="margin-top:50px;">
+		</div>
+	</nav>
+	<div class="container" style="margin-top:50px;">
 
-			<div class="row">
-				<P class="signUpSuccess"><?php if(isset($_SESSION['signUpSuccess'])){ echo 'Your sign up is successful! Login now!'; } ?></P>
-			</div>
+		<div class="row">
+			<P class="signUpSuccess"><?php if(isset($_SESSION['signUpSuccess'])){ echo 'Your sign up is successful! Login now!'; } ?></P>
+		</div>
 
-			<!-- LOGIN -->
-			<div class="col-md-6 col-sm-6 no-padng">   
-				<div class="model-l">
-					<div class="l">Login</div><br>                  
-					<form method="post" action="" id="loginForm" class="log-frm" name="loginForm"> 
-						<ul>                                                     
-							<div class="form-group <?php if($login_error){echo 'has-error';}?>" id="login_email">
-								<label class="control-label">EMAIL</label>
-								<input type="email" class="form-control" name="login_email" id="login_email_input" placeholder="Email" required/>
-							</div>
+		<!-- LOGIN -->
+		<div class="col-md-6 col-sm-6 no-padng">   
+			<div class="model-l">
+				<div class="l">Login</div><br>                  
+				<form method="post" action="" id="loginForm" class="log-frm" name="loginForm"> 
 
-							<div class="form-group <?php if($login_error){echo 'has-error';}?>">
-								<label class="control-label" id="login_pwd">PASSWORD</label>
-								<input type="password" class="form-control" name="login_pwd" id="login_name_input" placeholder="Password" required/>
-							</div>
-
-							<div class="form-group <?php if($login_error){echo 'has-error';}?>">
-								<span class="help-block"><?php echo $login_error; ?></span>
-							</div>
-
-							<div class="form-group">
-								<br><input type="submit" name="loginBtn" value="LOGIN" class="btn btn-primary active pull-right"/>
-							</div>
-						</form>
+					<div class="form-group <?php if($login_error){echo 'has-error';}?>" id="login_email">
+						<label class="control-label">EMAIL</label>
+						<input type="email" class="form-control" name="login_email" id="login_email_input" placeholder="Email" required/>
 					</div>
-				</div>    
 
-				<!-- SIGN UP -->
-				<div class="col-md-6 col-sm-6 no-padng">
-					<div class="model-r">
-						<div class="r">Sign Up</div><br>
-
-						<form method="post" action="" id="signUpForm" class="log-frm" name="signUpForm" onsubmit="return signUpFormValidation()">  
-
-							<div class="form-group" id="signup_name">
-								<label class="control-label">NAME</label>
-								<input type="text" class="form-control" name="signup_name" id="signup_name_input" placeholder="Name" value="<?php echo isset($user_name)?$user_name:""; ?>" required/>
-								<span id="signup_name_error" class="help-block"></span>
-							</div>
-							<div class="form-group <?php if($error){echo 'has-error';}?>" id="signup_email">
-								<label class="control-label">EMAIL</label>
-								<input type="email" class="form-control" name="signup_email" id="signup_email_input" placeholder="Email" value="<?php echo isset($user_email)?$user_email:""; ?>"  required/>
-								<span id="signup_email_error" class="help-block"><?php echo $error; ?></span>
-							</div>
-							<div class="form-group">
-								<label class="control-label">FACULTY</label>
-								<select class="form-control" name="signup_faculty">
-									<option value="0">NONE</option>
-									<option value="1">FOM</option>
-									<option value="2">FOE</option>
-									<option value="3">FCM</option>
-									<option value="4">FCI</option>
-									<option value="5">FAC</option>
-									<option value="6">CDP</option>
-								</select>
-							</div>
-							<div class="form-group" id="signup_pwd">
-								<label class="control-label">PASSWORD</label>
-								<input type="password" class="form-control" name="signup_pwd" id="signup_pwd_input" placeholder="Password" required/>
-								<span id="signup_pwd_error" class="help-block"></span>
-							</div>
-							<div class="form-group" id="signup_cpwd">
-								<label class="control-label">CONFIRM PASSWORD</label>
-								<input type="password" class="form-control" name="signup_cpwd" id="signup_cpwd_input" placeholder="Confirm your password" required/>
-								<span id="signup_cpwd_error" class="help-block"></span>
-							</div>
-
-							<div class="form-group">
-								<input type="submit" name="signUpBtn" value="SIGN UP" class="btn btn-info active pull-right"/>
-							</div>
-
-						</form>
+					<div class="form-group <?php if($login_error){echo 'has-error';}?>">
+						<label class="control-label" id="login_pwd">PASSWORD</label>
+						<input type="password" class="form-control" name="login_pwd" id="login_name_input" placeholder="Password" required/>
 					</div>
-				</div>
+
+					<div class="form-group <?php if($login_error){echo 'has-error';}?>">
+						<span class="help-block"><?php echo $login_error; ?></span>
+					</div>
+
+					<div class="form-group">
+						<br><input type="submit" name="loginBtn" value="LOGIN" class="btn btn-primary active pull-right"/>
+					</div>
+				</form>
 			</div>
+		</div>    
 
-			<script data-align="right" data-overlay="false" id="keyreply-script" src="//keyreply.com/chat/widget.js" data-color="#E4392B" data-apps="JTdCJTIyZmFjZWJvb2slMjI6JTIyMTAwMDAwMzU0Njc5MjA0JTIyLCUyMmVtYWlsJTIyOiUyMnNodXdlaS5wZWhAZ21haWwuY29tJTIyJTdE"></script>
+		<!-- SIGN UP -->
+		<div class="col-md-6 col-sm-6 no-padng">
+			<div class="model-r">
+				<div class="r">Sign Up</div><br>
 
-		</body>
-		</html>
+				<form method="post" action="" id="signUpForm" class="log-frm" name="signUpForm" onsubmit="return signUpFormValidation()">  
 
-		<script type="text/javascript">
+					<div class="form-group" id="signup_name">
+						<label class="control-label">NAME</label>
+						<input type="text" class="form-control" name="signup_name" id="signup_name_input" placeholder="Name" value="<?php echo isset($user_name)?$user_name:""; ?>" required/>
+						<span id="signup_name_error" class="help-block"></span>
+					</div>
+					<div class="form-group <?php if($error){echo 'has-error';}?>" id="signup_email">
+						<label class="control-label">EMAIL</label>
+						<input type="text" class="form-control" name="signup_email" id="signup_email_input" placeholder="Email" value="<?php echo isset($user_email)?$user_email:""; ?>"  required/>
+						<span id="signup_email_error" class="help-block"><?php echo $error; ?></span>
+					</div>
+					<div class="form-group">
+						<label class="control-label">FACULTY</label>
+						<select class="form-control" name="signup_faculty">
+							<option value="0">NONE</option>
+							<option value="1">FOM</option>
+							<option value="2">FOE</option>
+							<option value="3">FCM</option>
+							<option value="4">FCI</option>
+							<option value="5">FAC</option>
+							<option value="6">CDP</option>
+						</select>
+					</div>
+					<div class="form-group" id="signup_pwd">
+						<label class="control-label">PASSWORD</label>
+						<input type="password" class="form-control" name="signup_pwd" id="signup_pwd_input" placeholder="Password" required/>
+						<span id="signup_pwd_error" class="help-block"></span>
+					</div>
+					<div class="form-group" id="signup_cpwd">
+						<label class="control-label">CONFIRM PASSWORD</label>
+						<input type="password" class="form-control" name="signup_cpwd" id="signup_cpwd_input" placeholder="Confirm your password" required/>
+						<span id="signup_cpwd_error" class="help-block"></span>
+					</div>
 
-			function signUpFormValidation()
-			{
-				var name = document.getElementById("signup_name_input").value;
-				var emailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;  
-				var passwordformat = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
+					<div class="form-group">
+						<input type="submit" name="signUpBtn" value="SIGN UP" class="btn btn-info active pull-right"/>
+					</div>
+
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<script data-align="right" data-overlay="false" id="keyreply-script" src="//keyreply.com/chat/widget.js" data-color="#E4392B" data-apps="JTdCJTIyZmFjZWJvb2slMjI6JTIyMTAwMDAwMzU0Njc5MjA0JTIyLCUyMmVtYWlsJTIyOiUyMnNodXdlaS5wZWhAZ21haWwuY29tJTIyJTdE"></script>
+
+</body>
+</html>
+
+<script type="text/javascript">
+
+	function signUpFormValidation()
+	{
+		var name = document.getElementById("signup_name_input").value;
+		var emailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;  
+		var passwordformat = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
 
 		//check name
 		if(name.length<6 || name.length>20)  
