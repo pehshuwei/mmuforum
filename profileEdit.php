@@ -3,8 +3,13 @@
 include("dataconnection.php");
 
 $user_id = $_REQUEST["user_id"];
-$label = '';
+$label = "";
+$error_email = "";
+$error_oldpwd = "";
+$error_newpwd ="";
+$error_cnewpwd = "";
 
+//check whether user_id exists
 if ($_SESSION['user_id'] == $user_id)
 {
 	$sql_searchprofile = "select * from user where user_id = '$user_id'";
@@ -12,24 +17,109 @@ if ($_SESSION['user_id'] == $user_id)
 	$row=mysqli_fetch_assoc($search_profile);
 
 	if($row['user_status'] == 'VISITOR')
-	{
-		$label = 'label-default';
-	}
+	{	$label = 'label-default';}
 	else if($row['user_status'] == 'PENDING')
-	{
-		$label = 'label-warning';
-	}
+	{	$label = 'label-warning';}
 	else if($row['user_status'] == 'STUDENT')
-	{
-		$label = 'label-success';
-	}
+	{	$label = 'label-success';}
 	else if($row['user_status'] == 'BLOCKED')
-	{
-		$label = 'label-primary';
-	}
+	{	$label = 'label-primary';}
 	else if($row['user_status'] == 'ADMIN')
+	{	$label = 'label-info';}		
+
+	//profileEdit
+	if(isset($_POST['profileEditBtn']))
 	{
-		$label = 'label-info';
+		$user_name = $_POST['edit_name'];
+		$user_email = $_POST['edit_email'];
+		$edit_faculty = $_POST['edit_faculty'];
+		$user_about = $_POST['edit_about'];
+		$user_link = $_POST['edit_link'];
+
+		switch($edit_faculty)
+		{
+			case '0': $faculty = "NONE"; break;
+			case '1': $faculty = "FOM"; break;
+			case '2': $faculty = "FOE"; break; 
+			case '3': $faculty = "FCM"; break;
+			case '4': $faculty = "FCI"; break;
+			case '5': $faculty = "FAC"; break;
+			case '6': $faculty = "CDP"; break;
+			default : $faculty = "NONE"; break;
+		}
+
+		//check whether user is admin
+		//user
+		if($user_id!=1 && $user_id!=2 && $user_id!=3)
+		{
+			$sql_updateprofile = "update user set user_name='$user_name', faculty='$faculty', user_about='$user_about', user_link='$user_link' where user_id='$user_id'";
+			mysqli_query($conn,$sql_updateprofile);
+			mysqli_close($conn);
+			header('location: profile.php?user_id='.$user_id);
+		}//admin
+		else
+		{
+			$sql_checkemail = "select * from user where user_email = '$user_email'";
+			$check_email = mysqli_query($conn,$sql_checkemail);
+
+			//check email
+			if ($row=mysqli_fetch_assoc($check_email)) 
+			{
+				$error_email = "Email already exists.";
+			}
+			else
+			{
+				$sql_updateprofile = "update user set user_name='$user_name', user_email='$user_email', faculty='$faculty', user_about='$user_about', user_link='$user_link' where user_id='$user_id'";
+				mysqli_query($conn,$sql_updateprofile);
+				mysqli_close($conn);
+				header('location: profile.php?user_id='.$user_id);
+			}
+		}
+	}
+
+	//passwordEdit
+	if(isset($_POST['passwordEditBtn']))
+	{
+		$edit_oldpwd = $_POST['edit_oldpwd'];
+		$edit_newpwd = $_POST['edit_newpwd'];
+		$edit_cnewpwd = $_POST['edit_cnewpwd'];
+		$pwdformat = '/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/';
+
+
+		//cehck old password
+		if($edit_oldpwd!=$row['user_pwd']) 
+		{
+			$error_oldpwd = "Invalid old password.";
+			$edit_oldpwd = "";
+			$edit_newpwd = "";
+			$edit_cnewpwd = "";
+		}
+		else if(!preg_match($pwdformat,$edit_newpwd))
+		{
+			$error_oldpwd = "";
+			$error_newpwd = "Must be 6 to 16 characters which contain at least one numeric digit, one uppercase and one lowercase letter";
+			$edit_newpwd = "";
+			$edit_cnewpwd = "";
+		}
+		else if($edit_cnewpwd!=$edit_newpwd)
+		{
+			$error_oldpwd = "";
+			$error_newpwd = "";
+			$error_cnewpwd = "Password not match.";
+			$edit_cnewpwd = "";
+		}
+		else
+		{
+			$sql_updatepassword = "update user set user_pwd='$edit_newpwd' where user_id='$user_id'";
+			mysqli_query($conn,$sql_updatepassword);
+			mysqli_close($conn);
+			session_destroy();
+			session_start();
+			$_SESSION['updatePwdSuccess'] = true;
+			header('location: login.php');
+		}
+
+
 	}
 }
 else
@@ -107,8 +197,8 @@ else
 				<div class="panel panel-default">
 					<div class="panel-body">
 
-						<form class="form-horizontal">
-
+						<!-- profileEditForm =================== -->
+						<form id="profileEditForm" class="form-horizontal" method="post" action="" onsubmit="return profileEditValidation()">
 							<div class="col-md-4">
 								<label class="control-label">PROFILE PICTURE</label>
 								<div id="profile_image_preview"></div>
@@ -118,65 +208,81 @@ else
 							</div>
 
 							<div class="col-md-7">
-
-								<div class="form-group">
+								<div class="form-group" id="edit_name">
 									<label class="control-label">NAME</label>
-									<input type="text" class="form-control" name="title" value="<?php echo $row['user_name'];?>"/>
+									<input type="text" class="form-control" name="edit_name" id="edit_name_input" value="<?php echo $row['user_name'];?>" required/>
+									<span id="edit_name_error" class="help-block"></span>
 								</div>
 
-								<div class="form-group">
+								<div class="form-group <?php if($error_email){echo 'has-error';}?>" id="edit_email">
 									<label class="control-label">EMAIL</label>
-									<input type="email" class="form-control" name="title" disabled="" value="<?php echo $row['user_email'];?>"/>
+									<input type="email" class="form-control" name="edit_email" id="edit_email_input" <?php if($user_id!=1&&$user_id!=2&&$user_id!=3){echo 'disabled=""';}?> value="<?php echo $row['user_email'];?>" required/>
+									<span id="edit_email_error" class="help-block"><?php echo $error_email; ?></span>
 								</div>
 
 								<div class="form-group">
 									<label class="control-label">FACULTY</label>
-									<select class="form-control" name="category">
-										<option>NONE</option>
-										<option>FOM</option>
-										<option>FOE</option>
-										<option>FCM</option>
-										<option>FCI</option>
-										<option>FAC</option>
-										<option>CDP</option>
+									<select class="form-control" name="edit_faculty">
+										<option value="0" <?php if($row['faculty']=='NONE'){echo 'selected';}?>>NONE</option>
+										<option value="1"<?php if($row['faculty']=='FOM'){echo 'selected';}?>>FOM</option>
+										<option value="2"<?php if($row['faculty']=='FOE'){echo 'selected';}?>>FOE</option>
+										<option value="3"<?php if($row['faculty']=='FCM'){echo 'selected';}?>>FCM</option>
+										<option value="4"<?php if($row['faculty']=='FCI'){echo 'selected';}?>>FCI</option>
+										<option value="5"<?php if($row['faculty']=='FAC'){echo 'selected';}?>>FAC</option>
+										<option value="6"<?php if($row['faculty']=='CDP'){echo 'selected';}?>>CDP</option>
 									</select>
 								</div>
 
 								<div class="form-group">
 									<label class="control-label">ABOUT</label>
-									<textarea value="<?php echo $row['user_about'];?>" class="form-control" rows="3"></textarea>
+									<textarea class="form-control" rows="3" name="edit_about"><?php echo $row['user_about'];?></textarea>
 								</div>
 
 								<div class="form-group">
 									<label class="control-label">LINK</label>
-									<input type="text" class="form-control" name="title" value="<?php echo $row['user_link'];?>"/>
+									<input type="text" class="form-control" name="edit_link" value="<?php echo $row['user_link'];?>"/>
 								</div>
 
 								<div class="form-group">
 									STATUS | <span class="label <?php echo $label; ?>"><?php echo $row['user_status'];?></span> <a href="ID VERIFICATION USER.HTML"> Change status</a>
 								</div>
+
+								<div class="form-group">
+									<input type="submit" name="profileEditBtn" value="SAVE CHANGES" class="btn btn-primary pull-right"/>
+								</div>
 								<hr>
-								<div class="form-group">
-									<label class="control-label">CHANGE PASSWORD</label>
-									<input type="password" class="form-control" name="title" placeholder="Enter your old password"/>
-								</div>
-
-								<div class="form-group">
-									<label class="control-label">NEW PASSWORD</label>
-									<input type="password" class="form-control" name="title" placeholder="Enter your new password"/>
-								</div>
-
-								<div class="form-group">
-									<label class="control-label">CONFIRM NEW PASSWORD</label>
-									<input type="password" class="form-control" name="title" placeholder="Renter your new password"/>
-								</div>
-
-								<div class="col-md-offset-10"><a href="" class="btn btn-primary no-border">SAVE CHANGES</a></div>
-
-
-
 							</div>
 						</form>
+
+						<!-- passwordEditForm =================== -->
+						<form id="passwordEditForm" class="form-horizontal"  method="post" action="">
+							<div class="col-md-offset-4 col-md-7">
+								<div class="form-group <?php if($error_oldpwd){echo 'has-error';}?>">
+									<label class="control-label">CHANGE PASSWORD</label>
+									<input type="password" class="form-control" name="edit_oldpwd" placeholder="Enter your old password" value="<?php echo isset($edit_oldpwd)?$edit_oldpwd:""; ?>" required/>
+									<span class="help-block"><?php echo $error_oldpwd; ?></span>
+								</div>
+
+								<div class="form-group <?php if($error_newpwd){echo 'has-error';}?>">
+									<label class="control-label">NEW PASSWORD</label>
+									<input type="password" class="form-control" name="edit_newpwd" placeholder="Enter your new password" value="<?php echo isset($edit_newpwd)?$edit_newpwd:""; ?>" required/>
+									<span class="help-block"><?php echo $error_newpwd; ?></span>
+								</div>
+
+								<div class="form-group <?php if($error_cnewpwd){echo 'has-error';}?>">
+									<label class="control-label">CONFIRM NEW PASSWORD</label>
+									<input type="password" class="form-control" name="edit_cnewpwd" placeholder="Renter your new password" value="<?php echo isset($edit_cnewpwd)?$edit_cnewpwd:""; ?>" required/>
+									<span class="help-block"><?php echo $error_cnewpwd; ?></span>
+								</div>
+
+								<div class="form-group">
+									<input type="submit" name="passwordEditBtn" value="CHANGE PASSWORD" class="btn btn-primary pull-right"/>
+								</div>
+							</div>
+
+						</form>
+								
+
 					</div>
 				</div>
 			</div>
@@ -188,6 +294,8 @@ else
 </html>
 
 <script>
+
+	//image upload
 	$(document).ready(function() 
 	{
 		$("#profile_image").on('change', function() 
@@ -218,4 +326,37 @@ else
 
 		});
 	});
+
+	//profileEditValidation
+	function profileEditValidation()
+	{
+		var name = document.getElementById("edit_name_input").value;
+		var emailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+
+		//check name
+		if(name.length<6 || name.length>20)  
+		{ 	
+			document.getElementById("edit_name").className += " has-error";
+			document.getElementById("edit_name_error").innerHTML = "Must be 6 to 20 characters";
+			return false;
+		}//check email
+		else if(emailformat.test(document.getElementById("edit_email_input").value) == false)  
+		{
+			document.getElementById("edit_name").className = "form-group";
+			document.getElementById("edit_name_error").innerHTML = " ";
+			document.getElementById("edit_email").className += " has-error";
+			document.getElementById("edit_email_error").innerHTML = "You have entered an invalid email address!";
+			return false;
+		}
+		else
+		{
+			document.getElementById("edit_name").className = "form-group";
+			document.getElementById("edit_name_error").innerHTML = " ";
+			document.getElementById("edit_email").className = "form-group";
+			document.getElementById("edit_email_error").innerHTML = " ";
+			return true;
+		}
+
+
+	}
 </script>

@@ -5,6 +5,7 @@ include("dataconnection.php");
 $error = "";
 $login_error = "";
 
+//check whether user has logged in
 if(isset($_SESSION['authenticated'])){
 	header("Location: home.php");   
 }
@@ -22,15 +23,16 @@ else
 		switch($signup_faculty)
 		{
 			case '0': $faculty = "NONE"; break;
-			case '1': $faculty = "Faculty of Management"; break;
-			case '2': $faculty = "Faculty of Engineering"; break; 
-			case '3': $faculty = "Facutly of Creative Multimedia"; break;
-			case '4': $faculty = "Faculty of Computing and Informatics"; break;
-			case '5': $faculty = "Faculty of Applied Communication"; break;
-			case '6': $faculty = "Centre of Diploma"; break;
+			case '1': $faculty = "FOM"; break;
+			case '2': $faculty = "FOE"; break; 
+			case '3': $faculty = "FCM"; break;
+			case '4': $faculty = "FCI"; break;
+			case '5': $faculty = "FAC"; break;
+			case '6': $faculty = "CDP"; break;
 			default : $faculty = "NONE"; break;
 		}
 
+		//check email
 		$sql_checkemail = "select * from user where user_email = '$user_email'";
 		$check_email = mysqli_query($conn,$sql_checkemail);
 
@@ -49,7 +51,7 @@ else
 			mysqli_close($conn);
 			$_SESSION['signUpSuccess'] = true;
 			header("Location: login.php");	
-		}			
+		}
 	}
 
 	//LOGIN
@@ -59,8 +61,8 @@ else
 		$user_pwd = $_POST["login_pwd"];
 
 		$sql_loginCheck = "select * from user where user_email = '$user_email' and user_pwd = '$user_pwd'";
-
 		$check_user = mysqli_query($conn,$sql_loginCheck);
+
 		if($row=mysqli_fetch_assoc($check_user))
 		{
 			$_SESSION['user_id'] = $row['user_id'];
@@ -109,7 +111,7 @@ else
 			<!-- and navigate ====================-->
 			<div class=" nav navbar-nav navbar-right col-md-1 col-sm-7 col-xs-7" >
 				<ul class="nav nav-pills">
-					<li><a href="home.html">HOME</a></li>
+					<li><a href="home.php">HOME</a></li>
 				</ul>
 			</div>
 		</div>
@@ -117,7 +119,7 @@ else
 	<div class="container" style="margin-top:50px;">
 
 		<div class="row">
-			<P class="signUpSuccess"><?php if(isset($_SESSION['signUpSuccess'])){ echo 'Your sign up is successful! Login now!'; } ?></P>
+			<P class="signUpSuccess"><?php if(isset($_SESSION['signUpSuccess'])){ echo 'Your sign up is successful! Login now!'; } ?><?php if(isset($_SESSION['updatePwdSuccess'])){ echo 'Your password has changed! Login again!'; } ?></P>
 		</div>
 
 		<!-- LOGIN -->

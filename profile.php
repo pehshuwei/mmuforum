@@ -5,6 +5,13 @@ include("dataconnection.php");
 $user_id = $_REQUEST["user_id"];
 $label = '';
 
+//
+if (isset($_SESSION['authenticated'])==false)
+{
+	$_SESSION['user_id'] = '0';
+}
+
+//check whether user_id exists
 if($user_id)
 {
 	$sql_searchprofile = "select * from user where user_id = '$user_id'";
@@ -12,27 +19,15 @@ if($user_id)
 	$row=mysqli_fetch_assoc($search_profile);
 
 	if($row['user_status'] == 'VISITOR')
-	{
-		$label = 'label-default';
-	}
+	{	$label = 'label-default';}
 	else if($row['user_status'] == 'PENDING')
-	{
-		$label = 'label-warning';
-	}
+	{	$label = 'label-warning';}
 	else if($row['user_status'] == 'STUDENT')
-	{
-		$label = 'label-success';
-	}
+	{	$label = 'label-success';}
 	else if($row['user_status'] == 'BLOCKED')
-	{
-		$label = 'label-primary';
-	}
+	{	$label = 'label-primary';}
 	else if($row['user_status'] == 'ADMIN')
-	{
-		$label = 'label-info';
-	}
-
-		
+	{	$label = 'label-info';}		
 }
 else
 {
@@ -148,7 +143,7 @@ else
 							<?php
 							if ($_SESSION['user_id'] == $user_id)
 							{
-								echo '<div class="col-md-1"><a href="profileEdit.php?user_id='.$row['user_id'].'" class="btn btn-default no-border">EDIT</a></div>';
+								echo '<div class="col-md-1"><a href="profileEdit.php?user_id='.$row['user_id'].'" class="btn btn-default">EDIT</a></div>';
 							}
 							?>
 							
