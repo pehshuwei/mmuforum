@@ -1,6 +1,6 @@
 <!DOCTYPE HTML> 
-<HTML>
-	<HEAD>
+<html>
+	<head>
 		<title>
 			LALA LAND | MMU FORUM
 		</title>
@@ -33,14 +33,6 @@
 				<!-- search and navigate ====================-->
 				<div class=" nav navbar-nav navbar-right col-md-2 col-sm-7 col-xs-7" >
 				    <ul class="nav nav-pills">
-				    	<li>
-				    		<!--<form class="navbar-form no-margin no-border no-padding" role="search" >
-							    <div class="form-group">
-							        <input type="text" class="form-control" placeholder="Search">
-							    </div>
-						    </form>
-						</li>
-						<li><button type="submit" class="btn btn-default">Search</button></li>-->
 				    	<li><a href="home.html" >HOME</a></li>
 				    	<li><a href="profile.html" >PROFILE</a></li>
 					</ul>

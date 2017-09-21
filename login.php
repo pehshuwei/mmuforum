@@ -17,7 +17,6 @@ else
 		$user_name = $_POST["signup_name"];
 		$user_email = $_POST["signup_email"];
 		$user_pwd = $_POST["signup_pwd"];
-		$user_cpwd = $_POST["signup_cpwd"];
 		$signup_faculty = $_POST["signup_faculty"];
 
 		switch($signup_faculty)
@@ -45,8 +44,8 @@ else
 		else
 		{
 			$user_status = 'VISITOR';
-			$sql_insertsignup = "insert into user(user_name, user_email, user_pwd, user_cpwd, faculty, user_status)
-			values('$user_name', '$user_email', '$user_pwd', '$user_cpwd', '$faculty', '$user_status')";
+			$sql_insertsignup = "insert into user(user_name, user_email, user_pwd, faculty, user_status)
+			values('$user_name', '$user_email', '$user_pwd', '$faculty', '$user_status')";
 			mysqli_query($conn,$sql_insertsignup);
 			mysqli_close($conn);
 			$_SESSION['signUpSuccess'] = true;
@@ -67,6 +66,10 @@ else
 		{
 			$_SESSION['user_id'] = $row['user_id'];
 			$_SESSION['authenticated'] = true;
+			if($row['user_status'] == 'ADMIN' || $row['user_status'] == 'STUDENT')
+			{
+				$_SESSION['verified'] = true;
+			}
 			header("Location: home.php");	
 		}
 		else
