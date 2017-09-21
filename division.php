@@ -1,18 +1,41 @@
 <!DOCTYPE HTML> 
-<HTML>
-	<HEAD>
+<?php
+include("dataconnection.php");
+
+$division_id = $_REQUEST['division_id'];
+$error_signin = "";
+
+if($division_id)
+{
+	$sql_division = "select * from division where division_id = '$division_id'";
+	$division = mysqli_query($conn,$sql_division);
+	$row_div = mysqli_fetch_assoc($division);
+
+	//check whether user has logged in
+	if(isset($_SESSION['authenticated'])==false){
+		$error_signin = "Login to create topic";
+	}
+}
+else
+{
+	header('location: home.php');
+}
+
+?>
+<html>
+	<head>
 		<title>
-			CDP | MMU FORUM
+			<?php echo $row_div['division_id'];?> | MMU FORUM
 		</title>
 
 		<meta charset="utf-8">
-	    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-	    <meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" type="text/css" href="style/FYP_bootstrap.css"/>
 		<link rel="stylesheet" type="text/css" href="style/custom.css"/>
 		
-	</HEAD>
-	<BODY>
+	</head>
+	<body>
 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 	    <script src="js/bootstrap_js.js"></script>
@@ -23,26 +46,28 @@
 	 			<!-- logo ==================== -->
 				<div class="navbar-header col-md-8 col-sm-5 col-xs-5">
 					<a class="navbar-brand"> 
-						<a href="home.html">
+						<a href="home.php">
 							<img src="img/mmulogo.png" height="40px" name="Home" alt="Home"/>
 						</a>
 						<span class="font-size-20px">F<small>ORUM</small></span>
 					</a>
 				    </div>				
 
-				<!-- search and navigate ====================-->
-				<div class=" nav navbar-nav navbar-right col-md-4 col-sm-7 col-xs-7" >
+				<!-- navigate ====================-->
+				<div class="nav navbar-nav navbar-right <?php if (isset($_SESSION['authenticated'])){echo 'col-md-3';}else{echo 'col-md-2';}?> col-sm-4 col-xs-4" >
 				    <ul class="nav nav-pills">
-				    	<li>
-				    		<form class="navbar-form no-margin no-border no-padding" role="search" >
-							    <div class="form-group">
-							        <input type="text" class="form-control" placeholder="Search">
-							    </div>
-						    </form>
-						</li>
-						<li><button type="submit" class="btn btn-default">Search</button></li>
-				    	<li><a href="home.html" >HOME</a></li>
-				    	<li><a href="login.html" >LOGIN</a></li>
+				    	<li><a href="home.php">HOME</a></li>
+				    	<?php
+						if (isset($_SESSION['authenticated']))
+						{
+							echo '<li><a href="profile.php?user_id='.$_SESSION['user_id'].'">PROFILE</a></li>';
+							echo '<li><a href="logout.php">LOGOUT</a></li>';
+						}
+						else
+						{
+							echo '<li><a href="login.php">LOGIN</a></li>';
+						}
+						?>
 					</ul>
 				</div>
 			</div>
@@ -64,14 +89,20 @@
 			    <!-- for medium screen ==================== -->
 			    <div class="navbar-collapse collapse" id="bs-example-navbar-collapse-2">
 			    	<ul class="nav navbar-nav">
-				        <li><a href="#">ACCOMMODATION</a></li>
-				        <li><a href="#">FOM</a></li>
-				        <li><a href="#">FOE</a></li>
-				        <li><a href="#">FCM</a></li>
-				        <li><a href="#">FCI</a></li>
-				        <li><a href="#">FAC</a></li>
-				        <li><a href="division.html">CDP</a></li>
-				        <li><a href="shop.html">SHOP</a></li>
+				        <li><a href="division.php?division_id=FOM">FOM</a></li>
+				        <li><a href="division.php?division_id=FOE">FOE</a></li>
+				        <li><a href="division.php?division_id=FCM">FCM</a></li>
+				        <li><a href="division.php?division_id=FCI">FCI</a></li>
+				        <li><a href="division.php?division_id=FAC">FAC</a></li>
+				        <li><a href="division.php?division_id=CDP">CDP</a></li>
+				        <li><a href="division.php?division_id=ACC">ACCOMMODATION</a></li>
+				        <li><a href="division.php?division_id=FOOD">FOOD</a></li>
+				        <li><a href="division.php?division_id=GEN">GENERAL</a></li>
+				        <?php
+						if (isset($_SESSION['verified'])) {
+							echo '<li><a href="division.php?division_id=SHOP">SHOP</a></li>';
+						}
+					?>
 			    	</ul>
 			    </div>
 			</div>
@@ -81,17 +112,17 @@
 		<div class="row no-margin">
 			<div class="col-md-12">
 				<ul class="breadcrumb">
-					<li><a href="home.html">HOME</a></li>
-					<li class="active">CDP</li>
+					<li><a href="home.php">HOME</a></li>
+					<li class="active"><?php echo $row_div['division_name'];?></li>
 				</ul>
 			</div>
 		</div>
 		
 
 		<!--division title ==================== -->
-		<div class="row no-margin">
-			<div class="col-md-12 div-title">
-				- CDP -
+		<div class="row">
+			<div class="col-md-12 div-name">
+				<?php echo '- '.$row_div['division_name'].' -';?>
 			</div>
 		</div>
 
@@ -102,7 +133,8 @@
 			<div class="col-md-3 col-sm-3 col-xs-3">
 				<!--create topic button ==================== -->
 				<div class="list-group">
-					<a href="divisionNew.html" class="btn btn-primary btn-lg btn-block no-border">CREATE TOPIC</a>
+					<a <?php if(isset($_SESSION['authenticated'])){echo 'href="topicCreate.php?division_id='.$division_id.'"';}?>  class="btn btn-primary btn-block <?php if($error_signin){echo 'disabled';}?>">CREATE TOPIC</a>
+					<?php if($error_signin){echo '<span class="text-primary pull-right">'.$error_signin.'</span>';}?>
 				</div>
 
 				<!--filter ==================== -->
@@ -237,8 +269,7 @@
 		</div>
 
 	<script data-align="right" data-overlay="false" id="keyreply-script" src="//keyreply.com/chat/widget.js" data-color="#E4392B" data-apps="JTdCJTIyZmFjZWJvb2slMjI6JTIyMTAwMDAwMzU0Njc5MjA0JTIyLCUyMmVtYWlsJTIyOiUyMnNodXdlaS5wZWhAZ21haWwuY29tJTIyJTdE"></script>
-		
-	</BODY>
+	</body>
 
 
-</HTML>
+</html>

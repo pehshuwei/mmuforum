@@ -2,22 +2,61 @@
 <?php 
 include("dataconnection.php");
 
-//check whether user has logged in
-if(isset($_SESSION['authenticated'])==false){
-	header("Location: home.php");   
+$division_id = $_REQUEST['division_id'];
+$error_title = "";
+$error_desc = "";
+
+if($division_id)
+{
+	$sql_division = "select * from division where division_id = '$division_id'";
+	$division = mysqli_query($conn,$sql_division);
+	$row_div = mysqli_fetch_assoc($division);
+
+	//check whether user has logged in
+	if(isset($_SESSION['authenticated'])==false){
+		header('Location: home.php');   
+	}
+	else
+	{
+		//topicCreate
+		if(isset($_POST["topicCreateBtn"]))
+		{
+			$topic_title = $_POST['create_title'];
+			$topic_desc = $_POST['create_desc'];
+			$user_id = $_SESSION['user_id'];
+
+			//topicCreate validation
+			if(strlen($topic_title)<10)
+			{
+				$error_title = "Please insert at least 10 characters.";
+				
+			}
+			else if(strlen($topic_desc)<10)
+			{
+				$error_title = "";
+				$error_desc = "Please insert at least 10 characters.";
+				
+			}
+			else
+			{
+				$sql_inserttopic = "insert into topic(topic_title, topic_desc, topic_timestamp, user_id, division_id) 
+				values('$topic_title', '$topic_desc', now(), '$user_id', '$division_id')";
+				if (mysqli_query($conn,$sql_inserttopic)) {
+					$topic_id = mysqli_insert_id($conn);
+				}
+				mysqli_close($conn);
+				header('location: topic.php?topic_id='.$topic_id);
+			}
+		}
+	}
 }
 else
 {
-	if(isset($_POST['topicCreateBtn']))
-	{
-		$topic_title = $_POST['topic_title'];
-		$topic_desc = $_POST['topic_desc'];
-		$user_id = $_SESSION['user_id'];
-		$division_id = $_SESSION['division_id'];
-	}
+	header('location: home.php');
 }
 
 ?>
+
 <html>
 <head>
 	<title>
@@ -50,10 +89,20 @@ else
 			</div>				
 
 			<!-- search and navigate ====================-->
-			<div class=" nav navbar-nav navbar-right col-md-2 col-sm-7 col-xs-7" >
+			<div class=" nav navbar-nav navbar-right <?php if (isset($_SESSION['authenticated'])){echo 'col-md-3';}else{echo 'col-md-2';}?> col-sm-7 col-xs-7" >
 				<ul class="nav nav-pills">
-					<li><a href="profile.php?user_id=<?php echo $_SESSION['user_id'];?>">PROFILE</a></li>
-					<li><a href="home.php" >HOME</a></li>
+					<li><a href="home.php">HOME</a></li>
+					<?php
+					if (isset($_SESSION['authenticated']))
+					{
+						echo '<li><a href="profile.php?user_id='.$_SESSION['user_id'].'">PROFILE</a></li>';
+						echo '<li><a href="logout.php">LOGOUT</a></li>';
+					}
+					else
+					{
+						echo '<li><a href="login.php">LOGIN</a></li>';
+					}
+					?>
 				</ul>
 			</div>
 		</div>
@@ -74,16 +123,22 @@ else
 
 			<!-- for medium screen ==================== -->
 			<div class="navbar-collapse collapse" id="bs-example-navbar-collapse-2">
-				<ul class="nav navbar-nav">
-					<li><a href="#">ACCOMMODATION</a></li>
-					<li><a href="#">FOM</a></li>
-					<li><a href="#">FOE</a></li>
-					<li><a href="#">FCM</a></li>
-					<li><a href="#">FCI</a></li>
-					<li><a href="#">FAC</a></li>
-					<li><a href="division.html">CDP</a></li>
-					<li><a href="shop.html">SHOP</a></li>
-				</ul>
+			    <ul class="nav navbar-nav">
+					<li><a href="division.php?division_id=FOM">FOM</a></li>
+					<li><a href="division.php?division_id=FOE">FOE</a></li>
+					<li><a href="division.php?division_id=FCM">FCM</a></li>
+					<li><a href="division.php?division_id=FCI">FCI</a></li>
+					<li><a href="division.php?division_id=FAC">FAC</a></li>
+					<li><a href="division.php?division_id=CDP">CDP</a></li>
+					<li><a href="division.php?division_id=ACC">ACCOMMODATION</a></li>
+					<li><a href="division.php?division_id=FOOD">FOOD</a></li>
+					<li><a href="division.php?division_id=GEN">GENERAL</a></li>
+				    <?php
+						if (isset($_SESSION['verified'])) {
+							echo '<li><a href="division.php?division_id=SHOP">SHOP</a></li>';
+						}
+					?>
+			    </ul>
 			</div>
 		</div>
 	</nav>
@@ -92,9 +147,9 @@ else
 	<div class="row no-margin">
 		<div class="col-md-12">
 			<ul class="breadcrumb">
-				<li><a href="home.html">HOME</a></li>
-				<li><a href="#">FOM</a></li>
-				<li class="active">CREATE TOPIC</li>
+				<li><a href="home.php">HOME</a></li>
+				<li><a href="division.php?division_id=<?php echo $division_id;?>"><?php echo $row_div['division_name'];?></a></li>
+				<li class="active">Create Topic</li>
 			</ul>
 		</div>
 	</div>
@@ -117,26 +172,18 @@ else
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-body">
-						<form class="form-horizontal">
+						<form class="form-horizontal" method="post" action="">
 
-							<!-- upload photo ==================== -->
-							<div class="col-md-3">
-								<div class="form-group">
-									<div id="id_image_preview"></div>
-									<br/>
-									<input type="file"  name="image" accept=".jpg, .png" id="id_image"/>
-									<br/>
+							<div class="col-md-12">
+								<!-- topic title ==================== -->
+								<div class="form-group <?php if($error_title){echo 'has-error';}?>">
+									<input type="text" class="form-control" name="create_title" placeholder="TITLE" maxlength="100" value="<?php echo isset($topic_title)?$topic_title:"";?>" required/>
+									<span class="help-block"><?php if($error_title){echo $error_title;}?></span>
 								</div>
-							</div>
-
-							<div class="col-md-9">
-								<!-- item title ==================== -->
-								<div class="form-group">
-									<input type="text" class="form-control" name="create_title" placeholder="TITLE" value="<?php echo isset($topic_title)?$topic_title:"";?>" required/>
-								</div>
-								<!-- description -->
-								<div class="form-group">
-									<textarea placeholder="DESCRIPTION" class="form-control" name="create_desc" rows="10" required><?php echo isset($topic_desc)?$topic_desc:"";?></textarea>
+								<!-- topic description -->
+								<div class="form-group <?php if($error_desc){echo 'has-error';}?>">
+									<textarea placeholder="DESCRIPTION" class="form-control" name="create_desc" maxlength="1000" rows="10" required><?php echo isset($topic_desc)?$topic_desc:"";?></textarea>
+									<span class="help-block"><?php if($error_desc){echo $error_desc;}?></span>
 								</div>
 
 								<div class="form-group">
@@ -196,10 +243,4 @@ else
 		});
 	});
 
-
-
-	$(function(){
-		$('.normal').autosize();
-		$('.animated').autosize({append: "\n"});
-	});
 </script>	

@@ -33,11 +33,12 @@ fieldset[disabled] .form-control {
   opacity: 1;
 }
 /*DIVISION TITLE*/
-.div-title
+.div-name
 {
-	font-size: 75px;
-	text-align: center;
-	color: #0C51A1;
+    font-size: 4em;
+    text-align: center;
+    color: #0C51A1;
+    margin-bottom: 20px;
 }
 .border-red
 {
@@ -47,11 +48,19 @@ fieldset[disabled] .form-control {
 {
 	border-color: #0C51A1;
 }
+.text {
+    word-break: break-all;
+}
 /*USER PROFILE PICTURE*/
 .profile-pic
 {
     height: 250px;
     width: 250px;
+}
+.comment-dp
+{
+    height: 50px;
+    width: 50px;
 }
 .font-red
 {

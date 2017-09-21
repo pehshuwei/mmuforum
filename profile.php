@@ -4,12 +4,7 @@ include("dataconnection.php");
 
 $user_id = $_REQUEST["user_id"];
 $label = '';
-
-//
-if (isset($_SESSION['authenticated'])==false)
-{
-	$_SESSION['user_id'] = '0';
-}
+$nav_col = '';
 
 //check whether user_id exists
 if($user_id)
@@ -17,6 +12,20 @@ if($user_id)
 	$sql_searchprofile = "select * from user where user_id = '$user_id'";
 	$search_profile = mysqli_query($conn,$sql_searchprofile);
 	$row=mysqli_fetch_assoc($search_profile);
+
+	//set user_id for users those are not logged in
+	if (isset($_SESSION['authenticated']))
+	{
+		if($_SESSION['user_id']!=$user_id)
+		{	$nav_col = 'col-md-3';}
+		else
+		{	$nav_col = 'col-md-2';}
+	}
+	else
+	{
+		$_SESSION['user_id'] = '0';
+		$nav_col = 'col-md-1';
+	}
 
 	if($row['user_status'] == 'VISITOR')
 	{	$label = 'label-default';}
@@ -33,8 +42,6 @@ else
 {
 	header('location: home.php');
 }
-
-
 
 ?>
 <html>
@@ -69,10 +76,20 @@ else
 				</a>
 			</div>				
 
-			<!-- search and navigate ==================== -->
-			<div class=" nav navbar-nav navbar-right col-md-1 col-sm-7 col-xs-7 no-padding" >
+			<!-- navigate ==================== -->
+			<div class="nav navbar-nav navbar-right <?php if($nav_col){echo $nav_col;}?>  col-sm-7 col-xs-7 no-padding" >
 				<ul class="nav nav-pills">
-					<li><a href="home.php" >HOME</a></li>
+					<li><a href="home.php">HOME</a></li>
+					<?php
+						if (isset($_SESSION['authenticated']))
+						{
+							if ($_SESSION['user_id'] != $user_id)
+							{
+								echo '<li><a href="profile.php?user_id='.$_SESSION['user_id'].'">PROFILE</a></li>';
+							}
+							echo '<li><a href="logout.php">LOGOUT</a></li>';
+						}
+					?>
 				</ul>
 			</div>
 		</div>
@@ -113,30 +130,44 @@ else
 							</div>
 
 							<!-- profile details =================== -->
-							<div class="col-md-7">								
-								<ul class="list-group">
-									<li class="list-group-item no-border">
-										<b>NAME &emsp;&emsp; |</b> &emsp; <?php echo $row['user_name']; ?>
-									</li>
-									<li class="list-group-item no-border">
-										<b>EMAIL &emsp;&emsp; |</b> &emsp; <?php echo $row['user_email']; ?>
-									</li>
-									<li class="list-group-item no-border">
-										<b>FACULTY &emsp;&emsp; |</b> &emsp; <?php echo $row['faculty']; ?>
-									</li>
-									<li class="list-group-item no-border">
-										<b>ABOUT &emsp;&emsp; |</b> &emsp; <?php echo $row['user_about']; ?>
-									</li>
-									<li class="list-group-item no-border">
-										<b>LINK &emsp;&emsp; |</b> &emsp; <a href="<?php echo $row['user_link']; ?>"><?php echo $row['user_link']; ?></a>
-									</li>
-									<li class="list-group-item no-border">
-										<b>STATUS &emsp;&emsp; |</b> &emsp; <span class="label <?php echo $label; ?>"><?php echo $row['user_status'];?></span>
-									</li>
-									<li class="list-group-item no-border">
-										<b>POSTS &emsp;&emsp; |</b> &emsp; 6
-									</li>
-								</ul>
+							<div class="col-md-7">
+								<table class="table">
+									<tr>
+										<th class="no-border">NAME</th>
+										<td class="no-border">|</td>
+										<td class="no-border"><?php echo $row['user_name']; ?></td>
+									</tr>
+									<tr>
+										<th class="no-border">EMAIL</th>
+										<td class="no-border">|</td>
+										<td class="no-border"><?php echo $row['user_email']; ?></td>
+									</tr>
+									<tr>
+										<th class="no-border">FACULTY</th>
+										<td class="no-border">|</td>
+										<td class="no-border"><?php echo $row['faculty']; ?></td>
+									</tr>
+									<tr>
+										<th class="no-border">ABOUT</th>
+										<td class="no-border">|</td>
+										<td class="text no-border"><?php echo nl2br($row['user_about']); ?></td>
+									</tr>
+									<tr>
+										<th class="no-border">LINK</th>
+										<td class="no-border">|</td>
+										<td class="no-border"><a href="<?php echo $row['user_link']; ?>"><?php echo $row['user_link']; ?></a></td>
+									</tr>
+									<tr>
+										<th class="no-border">STATUS</th>
+										<td class="no-border">|</td>
+										<td class="no-border"><span class="label <?php echo $label; ?>"><?php echo $row['user_status'];?></span></td>
+									</tr>
+									<tr>
+										<th class="no-border">POSTS</th>
+										<td class="no-border">|</td>
+										<td class="no-border">6</td>
+									</tr>
+								</table>
 							</div>
 
 							<!-- edit button ===================== -->

@@ -86,7 +86,7 @@ if ($_SESSION['user_id'] == $user_id)
 		$pwdformat = '/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/';
 
 
-		//cehck old password
+		//check old password
 		if($edit_oldpwd!=$row['user_pwd']) 
 		{
 			$error_oldpwd = "Invalid old password.";
@@ -210,13 +210,13 @@ else
 							<div class="col-md-7">
 								<div class="form-group" id="edit_name">
 									<label class="control-label">NAME</label>
-									<input type="text" class="form-control" name="edit_name" id="edit_name_input" value="<?php echo $row['user_name'];?>" required/>
+									<input type="text" class="form-control" name="edit_name" id="edit_name_input" maxlength="20" value="<?php echo $row['user_name'];?>" required/>
 									<span id="edit_name_error" class="help-block"></span>
 								</div>
 
 								<div class="form-group <?php if($error_email){echo 'has-error';}?>" id="edit_email">
 									<label class="control-label">EMAIL</label>
-									<input type="email" class="form-control" name="edit_email" id="edit_email_input" <?php if($user_id!=1&&$user_id!=2&&$user_id!=3){echo 'disabled=""';}?> value="<?php echo $row['user_email'];?>" required/>
+									<input type="email" class="form-control" name="edit_email" id="edit_email_input" <?php if($user_id!=1&&$user_id!=2&&$user_id!=3){echo 'disabled=""';}?> maxlength="50" value="<?php echo $row['user_email'];?>" required/>
 									<span id="edit_email_error" class="help-block"><?php echo $error_email; ?></span>
 								</div>
 
@@ -235,12 +235,12 @@ else
 
 								<div class="form-group">
 									<label class="control-label">ABOUT</label>
-									<textarea class="form-control" rows="3" name="edit_about"><?php echo $row['user_about'];?></textarea>
+									<textarea class="form-control" rows="3" maxlength="100" name="edit_about"><?php echo $row['user_about'];?></textarea>
 								</div>
 
 								<div class="form-group">
 									<label class="control-label">LINK</label>
-									<input type="text" class="form-control" name="edit_link" value="<?php echo $row['user_link'];?>"/>
+									<input type="text" class="form-control" name="edit_link" maxlength="50" value="<?php echo $row['user_link'];?>"/>
 								</div>
 
 								<div class="form-group">
