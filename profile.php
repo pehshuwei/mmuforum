@@ -133,39 +133,39 @@ else
 							<div class="col-md-7">
 								<table class="table">
 									<tr>
-										<th class="no-border">NAME</th>
-										<td class="no-border">|</td>
-										<td class="no-border"><?php echo $row['user_name']; ?></td>
+										<th>NAME</th>
+										<td>|</td>
+										<td><?php echo $row['user_name']; ?></td>
 									</tr>
 									<tr>
-										<th class="no-border">EMAIL</th>
-										<td class="no-border">|</td>
-										<td class="no-border"><?php echo $row['user_email']; ?></td>
+										<th>EMAIL</th>
+										<td>|</td>
+										<td><?php echo $row['user_email']; ?></td>
 									</tr>
 									<tr>
-										<th class="no-border">FACULTY</th>
-										<td class="no-border">|</td>
-										<td class="no-border"><?php echo $row['faculty']; ?></td>
+										<th>FACULTY</th>
+										<td>|</td>
+										<td><?php echo $row['faculty']; ?></td>
 									</tr>
 									<tr>
-										<th class="no-border">ABOUT</th>
-										<td class="no-border">|</td>
-										<td class="text no-border"><?php echo nl2br($row['user_about']); ?></td>
+										<th>ABOUT</th>
+										<td>|</td>
+										<td class="text"><?php echo nl2br($row['user_about']); ?></td>
 									</tr>
 									<tr>
-										<th class="no-border">LINK</th>
-										<td class="no-border">|</td>
-										<td class="no-border"><a href="<?php echo $row['user_link']; ?>"><?php echo $row['user_link']; ?></a></td>
+										<th>LINK</th>
+										<td>|</td>
+										<td><a href="<?php echo $row['user_link']; ?>"><?php echo $row['user_link']; ?></a></td>
 									</tr>
 									<tr>
-										<th class="no-border">STATUS</th>
-										<td class="no-border">|</td>
-										<td class="no-border"><span class="label <?php echo $label; ?>"><?php echo $row['user_status'];?></span></td>
+										<th>STATUS</th>
+										<td>|</td>
+										<td><span class="label <?php echo $label; ?>"><?php echo $row['user_status'];?></span></td>
 									</tr>
 									<tr>
-										<th class="no-border">POSTS</th>
-										<td class="no-border">|</td>
-										<td class="no-border">6</td>
+										<th>POSTS</th>
+										<td>|</td>
+										<td>6</td>
 									</tr>
 								</table>
 							</div>

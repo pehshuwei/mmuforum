@@ -7,18 +7,26 @@ $error_signin = "";
 
 if($division_id)
 {
-	$sql_division = "select * from division where division_id = '$division_id'";
-	$division = mysqli_query($conn,$sql_division);
-	$row_div = mysqli_fetch_assoc($division);
+	//check user status when in SHOP div
+	if($division_id=="SHOP" && $_SESSION['verified']==false)
+	{
+		header("Location: home.php");
+	}
+	else
+	{
+		$sql_division = "select * from division where division_id = '$division_id'";
+		$division = mysqli_query($conn,$sql_division);
+		$row_div = mysqli_fetch_assoc($division);
 
-	//check whether user has logged in
-	if(isset($_SESSION['authenticated'])==false){
-		$error_signin = "Login to create topic";
+		//check whether user has logged in
+		if(isset($_SESSION['authenticated'])==false){
+			$error_signin = "Login to create topic";
+		}
 	}
 }
 else
 {
-	header('location: home.php');
+	header("Location: home.php");
 }
 
 ?>

@@ -3,22 +3,72 @@
 include("dataconnection.php");
 
 $topic_id = $_REQUEST['topic_id'];
+$error_comment = "";
 
 if($topic_id)
 {
+	//get topic
 	$sql_topic = "select * from topic where topic_id = '$topic_id'";
 	$topic = mysqli_query($conn,$sql_topic);
 	$row_topic = mysqli_fetch_assoc($topic);
 
-	$division_id = $row_topic['division_id'];
-	$sql_division = "select * from division where division_id = '$division_id'";
-	$division = mysqli_query($conn,$sql_division);
-	$row_div = mysqli_fetch_assoc($division);
+	//check whether topic exists
+	if (!$row_topic) 
+	{
+		header("Location: home.php");
+	}
+	else
+	{
+		//get topic
+		$division_id = $row_topic['division_id'];
+		$sql_division = "select * from division where division_id = '$division_id'";
+		$division = mysqli_query($conn,$sql_division);
+		$row_div = mysqli_fetch_assoc($division);
 
-	$user_id = $row_topic['user_id'];
-	$sql_owner = "select user_name from user where user_id = '$user_id'";
-	$owner =  mysqli_query($conn,$sql_owner);
-	$row_owner = mysqli_fetch_assoc($owner);
+		//check user status when in SHOP div
+		if($division_id=="SHOP" && $_SESSION['verified']==false)
+		{
+			header("Location: home.php");
+		}
+		else
+		{
+			//get topic
+			$owner_id = $row_topic['user_id'];
+			$sql_owner = "select user_name from user where user_id = '$owner_id'";
+			$owner =  mysqli_query($conn,$sql_owner);
+			$row_owner = mysqli_fetch_assoc($owner);
+
+			//topicDelete
+			if (isset($_POST['topicDeleteBtn'])) 
+			{
+				$sql_deletetopic = "delete from topic where topic_id = '$topic_id'";
+				mysqli_query($conn,$sql_deletetopic);
+				mysqli_close($conn);
+				header('location: division.php?division_id='.$division_id);
+			}
+
+			//commentCreate
+			if (isset($_POST["commentCreateBtn"])) 
+			{
+				$new_comment = $_POST['new_comment'];
+				$newcomment_userid =  $_SESSION['user_id'];
+
+				if(strlen($new_comment)<10)
+				{
+					$error_comment = "Please insert at least 10 characters.";		
+				}
+				else
+				{
+					$sql_insertcomment = "insert into comment(comment_text, comment_timestamp, user_id, topic_id) 
+						values('$new_comment', now(), '$newcomment_userid', '$topic_id')";
+					mysqli_query($conn,$sql_insertcomment);
+					mysqli_close($conn);
+					header('location: topic.php?topic_id='.$topic_id);
+				}
+			}
+
+		}
+	}
 }
 else
 {
@@ -132,8 +182,24 @@ else
 					<div class="panel-body text">
 						<h1><?php echo $row_topic['topic_title'];?></h1>
 						<blockquote><p><?php echo nl2br($row_topic['topic_desc']);?></p></blockquote>
+						<p class="text-primary"><?php if($division_id=="SHOP"){echo 'RM '.$row_topic['topic_itemprice'];}?></p>
+						<?php 
+						if($division_id=="SHOP")
+							{	echo '';
+						}
+						?>
 					</div>
 					<div class="panel-body text">
+						<?php
+						if($owner_id == $_SESSION['user_id'])
+						{
+							echo '<form method="post" action="" onsubmit="return topicDeleteConfirmation()";>
+							<div class="form-group">
+								<input type="submit" class="btn btn-danger btn-sm pull-left" name="topicDeleteBtn" value="DELETE"/>
+							</div>
+						</form>';
+						}
+						?>
 						<p class="pull-right">By <a href="profile.php?user_id=<?php echo $user_id?>"><?php echo $row_owner['user_name'];?></a>	| <?php echo $row_topic['topic_timestamp'];?> | <span class="label label-primary">XX Comments</span></p>
 					</div>
 				</div>				
@@ -150,18 +216,34 @@ else
 		<div class="row">
 			<div class="col-md-12">
 				<div class="well">
-					<div class="panel panel-default">
-						<div class="panel-body">
-							<div class="col-md-1 icon-user">
-								<img class="img-circle comment-dp" src="img/cat.jpg">
-							</div>
-							<div class="col-md-11">
-								<h4><a href="profile.php?user_id=<?php echo $user_id?>"><?php echo $row_owner['user_name'];?></a></h4>
-								<p>Smile in the mirror. Do that every morning and you'll start to see a big difference in your life.</p>
-								<p><?php echo $row_topic['topic_timestamp'];?></p>
-							</div>
-						</div>
-					</div>
+					<?php
+						//get comment
+						$sql_comment = "select * from comment where topic_id = '$topic_id'";
+						$comment = mysqli_query($conn,$sql_comment);
+
+						while($row_comment=mysqli_fetch_assoc($comment))
+						{
+							//get comment owner
+							$comm_owner_id = $row_comment['user_id'];
+							$sql_comm_owner = "select user_name from user where user_id = '$comm_owner_id'";
+							$comm_owner =  mysqli_query($conn,$sql_comm_owner);
+							$row_comm_owner = mysqli_fetch_assoc($comm_owner);
+
+							echo 
+							'<div class="panel panel-default">
+								<div class="panel-body">
+									<div class="col-md-1 icon-user">
+										<img class="img-circle comment-dp" src="img/cat.jpg">
+									</div>
+									<div class="col-md-11">
+										<h4><a href="profile.php?user_id='.$comm_owner_id.'">'.$row_comm_owner['user_name'].'</a></h4>
+										<p class="lead text">'. nl2br($row_comment['comment_text']).'</p>
+										<p><i>Posted on</i> '.$row_comment['comment_timestamp'].'</p>
+									</div>
+								</div>
+							</div>';
+						}
+					?>
 				</div>			
 			</div>
 		</div>
@@ -176,27 +258,42 @@ else
 		<div class="row">
 			<div class="col-md-12">
 				<div class="well">
-					<div class="panel panel-default">
-						<div class="panel-body">
-							<form class="form-horizontal" name="commentCreateForm" method="post" action="">
-								<div class="col-md-12">
-									<div class="form-group">
-										<textarea class="form-control" rows="3" maxlength="100" name=""></textarea>
-									</div>
-									<div class="form-group">
-										<input type="submit" name="commentCreateBtn" value="COMMENT" class="btn btn-primary pull-right"/>
-									</div>
-								</div>
-							</form>
+					<form class="form-horizontal" name="commentCreateForm" method="post" action="">
+						<div class="form-group <?php if($error_comment){echo 'has-error';}?>">
+							<div class="col-md-12">
+								<textarea placeholder="Write your comment here." class="form-control" name="new_comment" maxlength="500" rows="3" required><?php echo isset($new_comment)?$new_comment:"";?></textarea>
+								<span class="help-block"><?php if($error_comment){echo $error_comment;}?></span>
+							</div>
 						</div>
-					</div>
+						<div class="form-group">
+							<div class="col-md-3 pull-right">
+								<input type="submit" name="commentCreateBtn" value="COMMENT" class="btn btn-primary btn-block"/>
+							</div>
+						</div>
+					</form>
+
 				</div>
-								
+
 			</div>
 		</div>
 	</div>
 
-	<script data-align="right" data-overlay="false" id="keyreply-script" src="//keyreply.com/chat/widget.js" data-color="#E4392B" data-apps="JTdCJTIyZmFjZWJvb2slMjI6JTIyMTAwMDAwMzU0Njc5MjA0JTIyLCUyMmVtYWlsJTIyOiUyMnNodXdlaS5wZWhAZ21haWwuY29tJTIyJTdE"></script>
+<script data-align="right" data-overlay="false" id="keyreply-script" src="//keyreply.com/chat/widget.js" data-color="#E4392B" data-apps="JTdCJTIyZmFjZWJvb2slMjI6JTIyMTAwMDAwMzU0Njc5MjA0JTIyLCUyMmVtYWlsJTIyOiUyMnNodXdlaS5wZWhAZ21haWwuY29tJTIyJTdE"></script>
 
 </body>
 </html>
+
+<script type="text/javascript">
+	
+	function topicDeleteConfirmation()
+	{
+		if(confirm("Do you want to delete this topic? Action cannot be undo."))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+</script>
