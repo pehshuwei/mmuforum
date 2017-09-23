@@ -12,6 +12,7 @@ if($topic_id)
 	$sql_topic = "select * from topic where topic_id = '$topic_id'";
 	$topic = mysqli_query($conn,$sql_topic);
 	$row_topic = mysqli_fetch_assoc($topic);
+	$topic_status = $row_topic['topic_status'];
 
 	//CHECK whether topic exists
 	if (!$row_topic) 
@@ -34,7 +35,7 @@ if($topic_id)
 		else
 		{
 			//CHECK whether topic from shop have been approved
-			if($division_id=="SHOP")
+			if($division_id=="SHOP" && $topic_status=="")
 			{
 				header("Location: home.php");
 			}
@@ -46,11 +47,16 @@ if($topic_id)
 				$owner =  mysqli_query($conn,$sql_owner);
 				$row_owner = mysqli_fetch_assoc($owner);
 
+				//get comment
+				$sql_comment = "select * from comment where topic_id = '$topic_id'";
+				$comment = mysqli_query($conn,$sql_comment);
+				$comment_num = mysqli_num_rows($comment);
+
 				//CHECK whether user has logged in
 				if(isset($_SESSION['authenticated']))
 				{
 					//to check user status
-					$user_id= $_SESSION['user_id'];
+					$user_id = $_SESSION['user_id'];
 					$sql_checkstatus = "select user_status from user where user_id='$user_id'";
 					$check_status = mysqli_query($conn,$sql_checkstatus);
 					$row_user=mysqli_fetch_assoc($check_status);
@@ -242,7 +248,7 @@ else
 							?>
 						</div>
 						<div class="col-md-4 pull-right">
-							<p>By <a href="profile.php?user_id=<?php echo $owner_id?>"><?php echo $row_owner['user_name'];?></a>	| <?php echo $row_topic['topic_timestamp'];?> | <span class="label label-primary">XX Comments</span></p>
+							<p>By <a href="profile.php?user_id=<?php echo $owner_id?>"><?php echo $row_owner['user_name'];?></a>	| <?php echo $row_topic['topic_timestamp'];?> | <span class="label label-primary"><?php if($comment_num>1){echo $comment_num.' Comments';}else{echo $comment_num.' Comment';}?></span></p>
 						</div>
 					</div>
 				</div>				
@@ -252,7 +258,7 @@ else
 		<div class="row">
 			<div class="col-md-12">
 				<div class="page-header">
-					<h2>XX Comments</h2>
+					<h2><?php if($comment_num>1){echo $comment_num.' Comments';}else{echo $comment_num.' Comment';}?></h2>
 				</div>
 			</div>
 		</div>
@@ -260,10 +266,6 @@ else
 			<div class="col-md-12">
 				<div class="well">
 					<?php
-						//get comment
-						$sql_comment = "select * from comment where topic_id = '$topic_id'";
-						$comment = mysqli_query($conn,$sql_comment);
-
 						while($row_comment=mysqli_fetch_assoc($comment))
 						{
 							//get comment owner

@@ -157,7 +157,7 @@ else
 		<div class="row">
 			<div class="col-md-12">
 				<div class="page-header">
-					<h1><?php echo $item_num;?> item(s) needed to be approved</h1>
+					<h1><?php if($item_num>1){echo $item_num.' items';}else{echo $item_num.' item';}?> needed to be approved</h1>
 				</div>
 			</div>
 		</div>
@@ -177,7 +177,7 @@ else
 
 					echo '<div class="panel panel-default">
 					<div class="panel-body text">
-						<div class="col-md-9">
+						<div class="col-md-9 col-sm-12 col-xs-12">
 							<h2>'.nl2br($row_item['topic_title']).'</h2>
 						</div>
 					</div>
@@ -187,7 +187,7 @@ else
 							<p class="text-primary">RM '.$row_item['topic_itemprice'].'</p>
 							<p>By <a href="profile.php?user_id=<?php echo $owner_id?>">'.$row_owner['user_name'].'</a> | '.$row_item['topic_timestamp'].'</p>
 						</div>
-						<div class="col-md-2 pull-right">
+						<div class="col-md-2 col-sm-12 col-xs-12 pull-right">
 							<form method="post" action="" onsubmit="return itemApproveConfirmation()";>
 								<div class="form-group">
 									<input type="submit" class="btn btn-primary btn-block" name="itemApproveBtn" value="APPROVE"/>
