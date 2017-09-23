@@ -4,6 +4,7 @@ include("dataconnection.php");
 
 $topic_id = $_REQUEST['topic_id'];
 $error_comment = "";
+$error_login = "";
 
 if($topic_id)
 {
@@ -12,7 +13,7 @@ if($topic_id)
 	$topic = mysqli_query($conn,$sql_topic);
 	$row_topic = mysqli_fetch_assoc($topic);
 
-	//check whether topic exists
+	//CHECK whether topic exists
 	if (!$row_topic) 
 	{
 		header("Location: home.php");
@@ -25,48 +26,68 @@ if($topic_id)
 		$division = mysqli_query($conn,$sql_division);
 		$row_div = mysqli_fetch_assoc($division);
 
-		//check user status when in SHOP div
+		//CHECK user status when in SHOP div
 		if($division_id=="SHOP" && $_SESSION['verified']==false)
 		{
 			header("Location: home.php");
 		}
 		else
 		{
-			//get topic
-			$owner_id = $row_topic['user_id'];
-			$sql_owner = "select user_name from user where user_id = '$owner_id'";
-			$owner =  mysqli_query($conn,$sql_owner);
-			$row_owner = mysqli_fetch_assoc($owner);
-
-			//topicDelete
-			if (isset($_POST['topicDeleteBtn'])) 
+			//CHECK whether topic from shop have been approved
+			if($division_id=="SHOP")
 			{
-				$sql_deletetopic = "delete from topic where topic_id = '$topic_id'";
-				mysqli_query($conn,$sql_deletetopic);
-				mysqli_close($conn);
-				header('location: division.php?division_id='.$division_id);
+				header("Location: home.php");
 			}
-
-			//commentCreate
-			if (isset($_POST["commentCreateBtn"])) 
+			else
 			{
-				$new_comment = $_POST['new_comment'];
-				$newcomment_userid =  $_SESSION['user_id'];
+				//get topic owner
+				$owner_id = $row_topic['user_id'];
+				$sql_owner = "select user_name from user where user_id = '$owner_id'";
+				$owner =  mysqli_query($conn,$sql_owner);
+				$row_owner = mysqli_fetch_assoc($owner);
 
-				if(strlen($new_comment)<10)
+				//CHECK whether user has logged in
+				if(isset($_SESSION['authenticated']))
 				{
-					$error_comment = "Please insert at least 10 characters.";		
+					//to check user status
+					$user_id= $_SESSION['user_id'];
+					$sql_checkstatus = "select user_status from user where user_id='$user_id'";
+					$check_status = mysqli_query($conn,$sql_checkstatus);
+					$row_user=mysqli_fetch_assoc($check_status);
+
+					//topicDelete
+					if (isset($_POST['topicDeleteBtn'])) 
+					{
+						$sql_deletetopic = "delete from topic where topic_id = '$topic_id'";
+						mysqli_query($conn,$sql_deletetopic);
+						mysqli_close($conn);
+						header('location: division.php?division_id='.$division_id);
+					}
+
+					//commentCreate
+					if (isset($_POST["commentCreateBtn"])) 
+					{
+						$new_comment = $_POST['new_comment'];
+
+						if(strlen($new_comment)<10)
+						{
+							$error_comment = "Please insert at least 10 characters.";		
+						}
+						else
+						{
+							$sql_insertcomment = "insert into comment(comment_text, comment_timestamp, user_id, topic_id) 
+								values('$new_comment', now(), '$user_id', '$topic_id')";
+							mysqli_query($conn,$sql_insertcomment);
+							mysqli_close($conn);
+							header('location: topic.php?topic_id='.$topic_id);
+						}
+					}
 				}
 				else
 				{
-					$sql_insertcomment = "insert into comment(comment_text, comment_timestamp, user_id, topic_id) 
-						values('$new_comment', now(), '$newcomment_userid', '$topic_id')";
-					mysqli_query($conn,$sql_insertcomment);
-					mysqli_close($conn);
-					header('location: topic.php?topic_id='.$topic_id);
+					$error_login = true;
 				}
 			}
-
 		}
 	}
 }
@@ -114,7 +135,7 @@ else
 					<?php
 					if (isset($_SESSION['authenticated']))
 					{
-						echo '<li><a href="profile.php?user_id='.$_SESSION['user_id'].'">PROFILE</a></li>';
+						echo '<li><a href="profile.php?user_id='.$user_id.'">PROFILE</a></li>';
 						echo '<li><a href="logout.php">LOGOUT</a></li>';
 					}
 					else
@@ -153,8 +174,24 @@ else
 					<li><a href="division.php?division_id=FOOD">FOOD</a></li>
 					<li><a href="division.php?division_id=GEN">GENERAL</a></li>
 					<?php
-					if (isset($_SESSION['verified'])) {
-						echo '<li><a href="division.php?division_id=SHOP">SHOP</a></li>';
+					if(isset($_SESSION['authenticated']))
+					{
+						if (isset($_SESSION['verified'])) 
+						{
+							echo '<li><a href="division.php?division_id=SHOP">SHOP</a></li>';
+						}
+						if($row_user['user_status'] == 'ADMIN')
+						{							
+							echo '<li class="dropdown">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">ADMIN <span class="caret"></span></a>
+									<ul class="dropdown-menu" role="menu">
+										<li><a href="idVerification.php">ID VERIFICATION</a></li>
+										<li><a href="shopApproval.php">SHOP APPROVAL</a></li>
+										<li><a href="report.php">REPORT</a></li>
+										<li><a href="blockedUser.php">BLOCKED USER</a></li>
+									</ul>
+								</li>';
+						}
 					}
 					?>
 				</ul>
@@ -166,7 +203,7 @@ else
 	<div class="row no-margin">
 		<div class="col-md-12">
 			<ul class="breadcrumb">
-				<li><a href="home.php">HOME</a></li>
+				<li><a href="home.php">Home</a></li>
 				<li><a href="division.php?division_id=<?php echo $division_id;?>"><?php echo $row_div['division_name'];?></a></li>
 				<li class="active text"><?php echo $row_topic['topic_title'];?></li>
 			</ul>
@@ -180,27 +217,33 @@ else
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-body text">
-						<h1><?php echo $row_topic['topic_title'];?></h1>
-						<blockquote><p><?php echo nl2br($row_topic['topic_desc']);?></p></blockquote>
-						<p class="text-primary"><?php if($division_id=="SHOP"){echo 'RM '.$row_topic['topic_itemprice'];}?></p>
+						<h2><?php echo nl2br($row_topic['topic_title']);?></h2>
+						<blockquote><p><?php echo nl2br($row_topic['topic_desc']);?></p></blockquote>						
 						<?php 
 						if($division_id=="SHOP")
-							{	echo '';
+							{	echo '<p class="text-primary">RM '.$row_topic['topic_itemprice'].'</p>';
 						}
 						?>
 					</div>
-					<div class="panel-body text">
-						<?php
-						if($owner_id == $_SESSION['user_id'])
-						{
-							echo '<form method="post" action="" onsubmit="return topicDeleteConfirmation()";>
-							<div class="form-group">
-								<input type="submit" class="btn btn-danger btn-sm pull-left" name="topicDeleteBtn" value="DELETE"/>
-							</div>
-						</form>';
-						}
-						?>
-						<p class="pull-right">By <a href="profile.php?user_id=<?php echo $user_id?>"><?php echo $row_owner['user_name'];?></a>	| <?php echo $row_topic['topic_timestamp'];?> | <span class="label label-primary">XX Comments</span></p>
+					<div class="panel-body">
+						<div class="col-md-2 pull-left">
+							<?php
+							if(isset($_SESSION['authenticated']))
+							{
+								if($owner_id == $user_id)
+								{
+									echo '<form method="post" action="" onsubmit="return topicDeleteConfirmation()";>
+									<div class="form-group">
+										<input type="submit" class="btn btn-danger btn-sm btn-block" name="topicDeleteBtn" value="DELETE"/>
+									</div>
+								</form>';
+								}
+							}
+							?>
+						</div>
+						<div class="col-md-4 pull-right">
+							<p>By <a href="profile.php?user_id=<?php echo $owner_id?>"><?php echo $row_owner['user_name'];?></a>	| <?php echo $row_topic['topic_timestamp'];?> | <span class="label label-primary">XX Comments</span></p>
+						</div>
 					</div>
 				</div>				
 			</div>
@@ -209,7 +252,7 @@ else
 		<div class="row">
 			<div class="col-md-12">
 				<div class="page-header">
-					<h1>XX COMMENTS</h1>
+					<h2>XX Comments</h2>
 				</div>
 			</div>
 		</div>
@@ -251,7 +294,7 @@ else
 		<div class="row">
 			<div class="col-md-12">
 				<div class="page-header">
-					<h1>NEW COMMENT</h1>
+					<h2>New Comment</h2>
 				</div>
 			</div>
 		</div>
@@ -261,17 +304,19 @@ else
 					<form class="form-horizontal" name="commentCreateForm" method="post" action="">
 						<div class="form-group <?php if($error_comment){echo 'has-error';}?>">
 							<div class="col-md-12">
-								<textarea placeholder="Write your comment here." class="form-control" name="new_comment" maxlength="500" rows="3" required><?php echo isset($new_comment)?$new_comment:"";?></textarea>
+								<textarea placeholder="Write your comment here." class="form-control" name="new_comment" maxlength="500" rows="3" <?php if($error_login){echo 'disabled=""';}?> required><?php echo isset($new_comment)?$new_comment:"";?></textarea>
 								<span class="help-block"><?php if($error_comment){echo $error_comment;}?></span>
 							</div>
 						</div>
 						<div class="form-group">
+							<div class="col-md-3 pull-left">
+								<?php if($error_login){echo '<span class="text-primary"><b><a href="login.php">LOGIN</a></b> to comment.</span>';}?>
+							</div>
 							<div class="col-md-3 pull-right">
-								<input type="submit" name="commentCreateBtn" value="COMMENT" class="btn btn-primary btn-block"/>
+								<input type="submit" name="commentCreateBtn" value="COMMENT" class="btn btn-primary btn-block" <?php if($error_login){echo 'disabled=""';}?>/>
 							</div>
 						</div>
 					</form>
-
 				</div>
 
 			</div>
@@ -279,7 +324,6 @@ else
 	</div>
 
 <script data-align="right" data-overlay="false" id="keyreply-script" src="//keyreply.com/chat/widget.js" data-color="#E4392B" data-apps="JTdCJTIyZmFjZWJvb2slMjI6JTIyMTAwMDAwMzU0Njc5MjA0JTIyLCUyMmVtYWlsJTIyOiUyMnNodXdlaS5wZWhAZ21haWwuY29tJTIyJTdE"></script>
-
 </body>
 </html>
 
@@ -287,7 +331,7 @@ else
 	
 	function topicDeleteConfirmation()
 	{
-		if(confirm("Do you want to delete this topic? Action cannot be undo."))
+		if(confirm("Do you want to delete this topic? Action cannot be undone."))
 		{
 			return true;
 		}

@@ -2,130 +2,139 @@
 <?php 
 include("dataconnection.php");
 
-$user_id = $_REQUEST["user_id"];
-$label = "";
-$error_email = "";
-$error_oldpwd = "";
-$error_newpwd ="";
-$error_cnewpwd = "";
-
-//check whether user_id exists
-if ($_SESSION['user_id'] == $user_id)
-{
-	$sql_searchprofile = "select * from user where user_id = '$user_id'";
-	$search_profile = mysqli_query($conn,$sql_searchprofile);
-	$row=mysqli_fetch_assoc($search_profile);
-
-	if($row['user_status'] == 'VISITOR')
-	{	$label = 'label-default';}
-	else if($row['user_status'] == 'PENDING')
-	{	$label = 'label-warning';}
-	else if($row['user_status'] == 'STUDENT')
-	{	$label = 'label-success';}
-	else if($row['user_status'] == 'BLOCKED')
-	{	$label = 'label-primary';}
-	else if($row['user_status'] == 'ADMIN')
-	{	$label = 'label-info';}		
-
-	//profileEdit
-	if(isset($_POST['profileEditBtn']))
-	{
-		$user_name = $_POST['edit_name'];
-		$user_email = $_POST['edit_email'];
-		$edit_faculty = $_POST['edit_faculty'];
-		$user_about = $_POST['edit_about'];
-		$user_link = $_POST['edit_link'];
-
-		switch($edit_faculty)
-		{
-			case '0': $faculty = "NONE"; break;
-			case '1': $faculty = "FOM"; break;
-			case '2': $faculty = "FOE"; break; 
-			case '3': $faculty = "FCM"; break;
-			case '4': $faculty = "FCI"; break;
-			case '5': $faculty = "FAC"; break;
-			case '6': $faculty = "CDP"; break;
-			default : $faculty = "NONE"; break;
-		}
-
-		//check whether user is admin
-		//user
-		if($user_id!=1 && $user_id!=2 && $user_id!=3)
-		{
-			$sql_updateprofile = "update user set user_name='$user_name', faculty='$faculty', user_about='$user_about', user_link='$user_link' where user_id='$user_id'";
-			mysqli_query($conn,$sql_updateprofile);
-			mysqli_close($conn);
-			header('location: profile.php?user_id='.$user_id);
-		}//admin
-		else
-		{
-			$sql_checkemail = "select * from user where user_email = '$user_email'";
-			$check_email = mysqli_query($conn,$sql_checkemail);
-
-			//check email
-			if ($row=mysqli_fetch_assoc($check_email)) 
-			{
-				$error_email = "Email already exists.";
-			}
-			else
-			{
-				$sql_updateprofile = "update user set user_name='$user_name', user_email='$user_email', faculty='$faculty', user_about='$user_about', user_link='$user_link' where user_id='$user_id'";
-				mysqli_query($conn,$sql_updateprofile);
-				mysqli_close($conn);
-				header('location: profile.php?user_id='.$user_id);
-			}
-		}
-	}
-
-	//passwordEdit
-	if(isset($_POST['passwordEditBtn']))
-	{
-		$edit_oldpwd = $_POST['edit_oldpwd'];
-		$edit_newpwd = $_POST['edit_newpwd'];
-		$edit_cnewpwd = $_POST['edit_cnewpwd'];
-		$pwdformat = '/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/';
-
-
-		//check old password
-		if($edit_oldpwd!=$row['user_pwd']) 
-		{
-			$error_oldpwd = "Invalid old password.";
-			$edit_oldpwd = "";
-			$edit_newpwd = "";
-			$edit_cnewpwd = "";
-		}
-		else if(!preg_match($pwdformat,$edit_newpwd))
-		{
-			$error_oldpwd = "";
-			$error_newpwd = "Must be 6 to 16 characters which contain at least one numeric digit, one uppercase and one lowercase letter";
-			$edit_newpwd = "";
-			$edit_cnewpwd = "";
-		}
-		else if($edit_cnewpwd!=$edit_newpwd)
-		{
-			$error_oldpwd = "";
-			$error_newpwd = "";
-			$error_cnewpwd = "Password not match.";
-			$edit_cnewpwd = "";
-		}
-		else
-		{
-			$sql_updatepassword = "update user set user_pwd='$edit_newpwd' where user_id='$user_id'";
-			mysqli_query($conn,$sql_updatepassword);
-			mysqli_close($conn);
-			session_destroy();
-			session_start();
-			$_SESSION['updatePwdSuccess'] = true;
-			header('location: login.php');
-		}
-
-
-	}
+//check whether user has logged in
+if(isset($_SESSION['authenticated'])==false){
+	header('Location: home.php');   
 }
 else
 {
-	header("Location: home.php");
+	$user_id = $_REQUEST["user_id"];
+	$label = "";
+	$error_email = "";
+	$error_oldpwd = "";
+	$error_newpwd ="";
+	$error_cnewpwd = "";
+
+	//check whether user_id exists
+	if ($_SESSION['user_id'] == $user_id)
+	{
+		$sql_searchprofile = "select * from user where user_id = '$user_id'";
+		$search_profile = mysqli_query($conn,$sql_searchprofile);
+		$row = mysqli_fetch_assoc($search_profile);
+
+		if($row['user_status'] == 'VISITOR')
+			{	$label = 'label-default';}
+		else if($row['user_status'] == 'PENDING')
+			{	$label = 'label-warning';}
+		else if($row['user_status'] == 'STUDENT')
+			{	$label = 'label-success';}
+		else if($row['user_status'] == 'BLOCKED')
+			{	$label = 'label-primary';}
+		else if($row['user_status'] == 'ADMIN')
+			{	$label = 'label-info';}		
+
+		//profileEdit
+		if(isset($_POST['profileEditBtn']))
+		{
+			$user_name = $_POST['edit_name'];
+			$user_email = $_POST['edit_email'];
+			$edit_faculty = $_POST['edit_faculty'];
+			$user_about = $_POST['edit_about'];
+			$user_link = $_POST['edit_link'];
+
+			switch($edit_faculty)
+			{
+				case '0': $faculty = "NONE"; break;
+				case '1': $faculty = "FOM"; break;
+				case '2': $faculty = "FOE"; break; 
+				case '3': $faculty = "FCM"; break;
+				case '4': $faculty = "FCI"; break;
+				case '5': $faculty = "FAC"; break;
+				case '6': $faculty = "CDP"; break;
+				default : $faculty = "NONE"; break;
+			}
+
+			//check whether user is admin
+			//user
+			if($user_id!=1 && $user_id!=2 && $user_id!=3)
+			{
+				$sql_updateprofile = "update user set user_name='$user_name', faculty='$faculty', user_about='$user_about', user_link='$user_link' where user_id='$user_id'";
+				mysqli_query($conn,$sql_updateprofile);
+				mysqli_close($conn);
+				header('location: profile.php?user_id='.$user_id);
+			}//admin
+			else
+			{
+				$sql_checkemail = "select * from user where user_email = '$user_email'";
+				$check_email = mysqli_query($conn,$sql_checkemail);
+
+				//check email
+				if ($row=mysqli_fetch_assoc($check_email)) 
+				{
+					$error_email = "Email already exists.";
+				}
+				else
+				{
+					$sql_updateprofile = "update user set user_name='$user_name', user_email='$user_email', faculty='$faculty', user_about='$user_about', user_link='$user_link' where user_id='$user_id'";
+					mysqli_query($conn,$sql_updateprofile);
+					mysqli_close($conn);
+					header('location: profile.php?user_id='.$user_id);
+				}
+			}
+		}
+
+		//passwordEdit
+		if(isset($_POST['passwordEditBtn']))
+		{
+			$edit_oldpwd = $_POST['edit_oldpwd'];
+			$edit_newpwd = $_POST['edit_newpwd'];
+			$edit_cnewpwd = $_POST['edit_cnewpwd'];
+			$pwdformat = '/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/';
+
+
+			//check old password
+			if($edit_oldpwd!=$row['user_pwd']) 
+			{
+				$error_oldpwd = "Invalid old password.";
+				$edit_oldpwd = "";
+				$edit_newpwd = "";
+				$edit_cnewpwd = "";
+			}
+			else if(!preg_match($pwdformat,$edit_newpwd))
+			{
+				$error_oldpwd = "";
+				$error_newpwd = "Must be 6 to 16 characters which contain at least one numeric digit, one uppercase and one lowercase letter";
+				$edit_newpwd = "";
+				$edit_cnewpwd = "";
+			}
+			else if($edit_cnewpwd!=$edit_newpwd)
+			{
+				$error_oldpwd = "";
+				$error_newpwd = "";
+				$error_cnewpwd = "Password not match.";
+				$edit_cnewpwd = "";
+			}
+			else
+			{
+				$sql_updatepassword = "update user set user_pwd='$edit_newpwd' where user_id='$user_id'";
+				mysqli_query($conn,$sql_updatepassword);
+				mysqli_close($conn);
+				session_destroy();
+				session_start();
+				$_SESSION['updatePwdSuccess'] = true;
+				header('location: login.php');
+			}
+
+
+		}
+	}
+	else
+	{
+		header("Location: home.php");
+	}
+
 }
+
 
 
 ?>
@@ -146,6 +155,8 @@ else
 <body>
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 	<script src="bootstrap_js.js"></script>
 
 	<!-- upheader ==================== -->
@@ -162,9 +173,57 @@ else
 			</div>				
 
 			<!-- navigate ==================== -->
-			<div class=" nav navbar-nav navbar-right col-md-1 col-sm-7 col-xs-7 no-padding" >
+			<div class=" nav navbar-nav navbar-right col-md-2 col-sm-7 col-xs-7 no-padding" >
 				<ul class="nav nav-pills">
 					<li><a href="home.php" >HOME</a></li>
+					<li><a href="logout.php">LOGOUT</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	<!-- downheader ==================== -->
+	<nav class="navbar navbar-inverse no-border-radius">
+		<div class="container-fluid">
+			<!-- for smaller screan ==================== -->
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+			</div>
+
+			<!-- for medium screen ==================== -->
+			<div class="navbar-collapse collapse" id="bs-example-navbar-collapse-2">
+				<ul class="nav navbar-nav">
+					<li><a href="division.php?division_id=FOM">FOM</a></li>
+					<li><a href="division.php?division_id=FOE">FOE</a></li>
+					<li><a href="division.php?division_id=FCM">FCM</a></li>
+					<li><a href="division.php?division_id=FCI">FCI</a></li>
+					<li><a href="division.php?division_id=FAC">FAC</a></li>
+					<li><a href="division.php?division_id=CDP">CDP</a></li>
+					<li><a href="division.php?division_id=ACC">ACCOMMODATION</a></li>
+					<li><a href="division.php?division_id=FOOD">FOOD</a></li>
+					<li><a href="division.php?division_id=GEN">GENERAL</a></li>
+					<?php
+					if (isset($_SESSION['verified'])) {
+						echo '<li><a href="division.php?division_id=SHOP">SHOP</a></li>';
+					}
+					if($row['user_status'] == 'ADMIN')
+					{							
+						echo '<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">ADMIN <span class="caret"></span></a>
+								<ul class="dropdown-menu" role="menu">
+									<li><a href="idVerification.php">ID VERIFICATION</a></li>
+									<li><a href="shopApproval.php">SHOP APPROVAL</a></li>
+									<li><a href="report.php">REPORT</a></li>
+									<li><a href="blockedUser.php">BLOCKED USER</a></li>
+								</ul>
+							</li>';
+					}
+					?>
 				</ul>
 			</div>
 		</div>
@@ -175,7 +234,8 @@ else
 		<div class="col-md-12">
 			<ul class="breadcrumb">
 				<li><a href="home.php">HOME</a></li>
-				<li class="active">PROFILE</li>
+				<li><a href="profile.php?user_id=<?php echo $user_id;?>">PROFILE</a></li>
+				<li class="active">PROFILE EDIT</li>
 			</ul>
 		</div>
 	</div>
@@ -281,7 +341,7 @@ else
 							</div>
 
 						</form>
-								
+
 
 					</div>
 				</div>

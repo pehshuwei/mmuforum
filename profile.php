@@ -2,21 +2,27 @@
 <?php 
 include("dataconnection.php");
 
-$user_id = $_REQUEST["user_id"];
+$profile_id = $_REQUEST["user_id"];
 $label = '';
 $nav_col = '';
 
 //check whether user_id exists
-if($user_id)
+if($profile_id)
 {
-	$sql_searchprofile = "select * from user where user_id = '$user_id'";
+	$sql_searchprofile = "select * from user where user_id = '$profile_id'";
 	$search_profile = mysqli_query($conn,$sql_searchprofile);
-	$row=mysqli_fetch_assoc($search_profile);
+	$row = mysqli_fetch_assoc($search_profile);
 
 	//set user_id for users those are not logged in
 	if (isset($_SESSION['authenticated']))
 	{
-		if($_SESSION['user_id']!=$user_id)
+		//to check user status
+		$user_id = $_SESSION['user_id'];
+		$sql_checkstatus = "select user_status from user where user_id='$user_id'";
+		$check_status = mysqli_query($conn,$sql_checkstatus);
+		$row_user=mysqli_fetch_assoc($check_status);
+
+		if($user_id!=$profile_id)
 		{	$nav_col = 'col-md-3';}
 		else
 		{	$nav_col = 'col-md-2';}
@@ -83,12 +89,59 @@ else
 					<?php
 						if (isset($_SESSION['authenticated']))
 						{
-							if ($_SESSION['user_id'] != $user_id)
+							if ($user_id!=$profile_id)
 							{
-								echo '<li><a href="profile.php?user_id='.$_SESSION['user_id'].'">PROFILE</a></li>';
+								echo '<li><a href="profile.php?user_id='.$user_id.'">PROFILE</a></li>';
 							}
 							echo '<li><a href="logout.php">LOGOUT</a></li>';
 						}
+					?>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	<!-- downheader ==================== -->
+	<nav class="navbar navbar-inverse no-border-radius">
+		<div class="container-fluid">
+			<!-- for smaller screan ==================== -->
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+			</div>
+
+			<!-- for medium screen ==================== -->
+			<div class="navbar-collapse collapse" id="bs-example-navbar-collapse-2">
+				<ul class="nav navbar-nav">
+					<li><a href="division.php?division_id=FOM">FOM</a></li>
+					<li><a href="division.php?division_id=FOE">FOE</a></li>
+					<li><a href="division.php?division_id=FCM">FCM</a></li>
+					<li><a href="division.php?division_id=FCI">FCI</a></li>
+					<li><a href="division.php?division_id=FAC">FAC</a></li>
+					<li><a href="division.php?division_id=CDP">CDP</a></li>
+					<li><a href="division.php?division_id=ACC">ACCOMMODATION</a></li>
+					<li><a href="division.php?division_id=FOOD">FOOD</a></li>
+					<li><a href="division.php?division_id=GEN">GENERAL</a></li>
+					<?php
+					if (isset($_SESSION['verified'])) {
+						echo '<li><a href="division.php?division_id=SHOP">SHOP</a></li>';
+					}
+					if($row['user_status'] == 'ADMIN')
+					{							
+						echo '<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">ADMIN <span class="caret"></span></a>
+								<ul class="dropdown-menu" role="menu">
+									<li><a href="idVerification.php">ID VERIFICATION</a></li>
+									<li><a href="shopApproval.php">SHOP APPROVAL</a></li>
+									<li><a href="report.php">REPORT</a></li>
+									<li><a href="blockedUser.php">BLOCKED USER</a></li>
+								</ul>
+							</li>';
+					}
 					?>
 				</ul>
 			</div>
@@ -172,9 +225,9 @@ else
 
 							<!-- edit button ===================== -->
 							<?php
-							if ($_SESSION['user_id'] == $user_id)
+							if ($user_id== $profile_id)
 							{
-								echo '<div class="col-md-1"><a href="profileEdit.php?user_id='.$row['user_id'].'" class="btn btn-default">EDIT</a></div>';
+								echo '<div class="col-md-1"><a href="profileEdit.php?user_id='.$profile_id.'" class="btn btn-default">EDIT</a></div>';
 							}
 							?>
 							

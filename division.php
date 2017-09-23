@@ -3,26 +3,43 @@
 include("dataconnection.php");
 
 $division_id = $_REQUEST['division_id'];
-$error_signin = "";
+$error_login = "";
 
 if($division_id)
 {
-	//check user status when in SHOP div
-	if($division_id=="SHOP" && $_SESSION['verified']==false)
+	$sql_division = "select * from division where division_id = '$division_id'";
+	$division = mysqli_query($conn,$sql_division);
+	$row_div = mysqli_fetch_assoc($division);
+
+	//check whether topic exists
+	if (!$row_div) 
 	{
 		header("Location: home.php");
 	}
 	else
 	{
-		$sql_division = "select * from division where division_id = '$division_id'";
-		$division = mysqli_query($conn,$sql_division);
-		$row_div = mysqli_fetch_assoc($division);
-
-		//check whether user has logged in
-		if(isset($_SESSION['authenticated'])==false){
-			$error_signin = "Login to create topic";
+		//check user status when in SHOP div
+		if($division_id=="SHOP" && $_SESSION['verified']==false)
+		{
+			header("Location: home.php");
 		}
-	}
+		else
+		{
+			//check whether user has logged in
+			if(isset($_SESSION['authenticated']))
+			{
+				//to check user status
+				$user_id= $_SESSION['user_id'];
+				$sql_checkstatus = "select user_status from user where user_id='$user_id'";
+				$check_status = mysqli_query($conn,$sql_checkstatus);
+				$row_user=mysqli_fetch_assoc($check_status);
+			}
+			else
+			{
+				$error_login = true;
+			}
+		}
+	}	
 }
 else
 {
@@ -33,7 +50,7 @@ else
 <html>
 	<head>
 		<title>
-			<?php echo $row_div['division_id'];?> | MMU FORUM
+			<?php echo $row_div['division_name'];?> | MMU FORUM
 		</title>
 
 		<meta charset="utf-8">
@@ -45,7 +62,7 @@ else
 	</head>
 	<body>
 
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>		
 	    <script src="js/bootstrap_js.js"></script>
 
 	    <!-- upheader ==================== -->
@@ -107,10 +124,26 @@ else
 				        <li><a href="division.php?division_id=FOOD">FOOD</a></li>
 				        <li><a href="division.php?division_id=GEN">GENERAL</a></li>
 				        <?php
-						if (isset($_SESSION['verified'])) {
-							echo '<li><a href="division.php?division_id=SHOP">SHOP</a></li>';
+				        if(isset($_SESSION['authenticated']))
+						{
+							if (isset($_SESSION['verified'])) 
+							{
+								echo '<li><a href="division.php?division_id=SHOP">SHOP</a></li>';
+							}
+							if($row_user['user_status'] == 'ADMIN')
+							{							
+								echo '<li class="dropdown">
+									<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">ADMIN <span class="caret"></span></a>
+									<ul class="dropdown-menu" role="menu">
+										<li><a href="idVerification.php">ID VERIFICATION</a></li>
+										<li><a href="#">SHOP APPROVAL</a></li>
+										<li><a href="report.php">REPORT</a></li>
+										<li><a href="blockedUser.php">BLOCKED USER</a></li>
+									</ul>
+								</li>';
+							}
 						}
-					?>
+						?>
 			    	</ul>
 			    </div>
 			</div>
@@ -141,8 +174,8 @@ else
 			<div class="col-md-3 col-sm-3 col-xs-3">
 				<!--create topic button ==================== -->
 				<div class="list-group">
-					<a <?php if(isset($_SESSION['authenticated'])){echo 'href="topicCreate.php?division_id='.$division_id.'"';}?>  class="btn btn-primary btn-block <?php if($error_signin){echo 'disabled';}?>">CREATE TOPIC</a>
-					<?php if($error_signin){echo '<span class="text-primary pull-right">'.$error_signin.'</span>';}?>
+					<a <?php if(isset($_SESSION['authenticated'])){echo 'href="topicCreate.php?division_id='.$division_id.'"';}?>  class="btn btn-primary btn-block <?php if($error_login){echo 'disabled';}?>">CREATE TOPIC</a>
+					<?php if($error_login){echo '<span class="text-primary pull-right"><b><a href="login.php">LOGIN</a></b> to create topic.</span>';}?>
 				</div>
 
 				<!--filter ==================== -->

@@ -26,14 +26,18 @@ if($division_id)
 		}
 		else
 		{
+			//to check user status
+			$user_id = $_SESSION['user_id'];
+			$sql_checkstatus = "select user_status from user where user_id='$user_id'";
+			$check_status = mysqli_query($conn,$sql_checkstatus);
+			$row_user = mysqli_fetch_assoc($check_status);
+
 			//topicCreate
 			if(isset($_POST["topicCreateBtn"]))
 			{
 				$topic_title = $_POST['create_title'];
 				$topic_desc = $_POST['create_desc'];
 				$create_itemprice = $_POST['create_itemprice'];
-				$user_id = $_SESSION['user_id'];
-
 				//format price input
 				if(isset($create_itemprice))
 				{
@@ -162,6 +166,18 @@ else
 					if (isset($_SESSION['verified'])) {
 						echo '<li><a href="division.php?division_id=SHOP">SHOP</a></li>';
 					}
+					if($row_user['user_status'] == 'ADMIN')
+					{							
+						echo '<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">ADMIN <span class="caret"></span></a>
+								<ul class="dropdown-menu" role="menu">
+									<li><a href="idVerification.php">ID VERIFICATION</a></li>
+									<li><a href="shopApproval.php">SHOP APPROVAL</a></li>
+									<li><a href="report.php">REPORT</a></li>
+									<li><a href="blockedUser.php">BLOCKED USER</a></li>
+								</ul>
+							</li>';
+					}
 					?>
 				</ul>
 			</div>
@@ -241,8 +257,8 @@ else
 
 							<!-- sell button ==================== -->
 							<div class="col-md-4">
-								<label class="control-label">__________</label>
-								<input class="btn btn-primary btn-block" type="submit" name="topicCreateBtn" value="<?php if($division_id=="SHOP"){echo 'SELL IT';}else{echo 'POST';}?>" />
+								<label class="control-label">Submit to get approval from admin.</label>
+								<input class="btn btn-primary btn-block" type="submit" name="topicCreateBtn" value="<?php if($division_id=="SHOP"){echo 'SUBMIT ITEM';}else{echo 'POST';}?>" />
 							</div>
 						</div>
 					</form>

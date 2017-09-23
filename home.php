@@ -1,6 +1,14 @@
 <!DOCTYPE HTML> 
 <?php 
 include("dataconnection.php");
+
+if (isset($_SESSION['authenticated']))
+{
+	$user_id= $_SESSION['user_id'];
+	$sql_checkstatus = "select user_status from user where user_id='$user_id'";
+	$check_status = mysqli_query($conn,$sql_checkstatus);
+	$row=mysqli_fetch_assoc($check_status);
+}
 ?>
 <html> 
 <head>
@@ -45,11 +53,24 @@ include("dataconnection.php");
 			</div>				
 
 			<!-- navigate ====================-->
-			<div class=" nav navbar-nav navbar-right <?php if (isset($_SESSION['authenticated'])){echo 'col-md-2';}else{echo 'col-md-1';}?> col-sm-7 col-xs-7" >
+			<div class=" nav navbar-nav navbar-right <?php if (isset($_SESSION['authenticated'])){if($row['user_status']=='ADMIN'){echo 'col-md-3';}else{echo 'col-md-2';}}else{echo 'col-md-1';}?> col-sm-7 col-xs-7" >
 				<ul class="nav nav-pills">
+
 					<?php
 					if (isset($_SESSION['authenticated']))
 					{
+						if($row['user_status'] == 'ADMIN')
+						{							
+							echo '<li class="dropdown">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">ADMIN <span class="caret"></span></a>
+								<ul class="dropdown-menu" role="menu">
+									<li><a href="idVerification.php">ID VERIFICATION</a></li>
+									<li><a href="shopApproval.php">SHOP APPROVAL</a></li>
+									<li><a href="report.php">REPORT</a></li>
+									<li><a href="blockedUser.php">BLOCKED USER</a></li>
+								</ul>
+							</li>';
+						}
 						echo '<li><a href="profile.php?user_id='.$_SESSION['user_id'].'">PROFILE</a></li>';
 						echo '<li><a href="logout.php">LOGOUT</a></li>';
 					}
