@@ -59,7 +59,7 @@ else
 <html>
 <head>
 	<title>
-		PROFILE | MMU FORUM
+		Profile | MMU FORUM
 	</title>
 
 	<meta charset="utf-8">

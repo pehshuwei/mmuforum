@@ -257,7 +257,7 @@ else
 
 							<!-- sell button ==================== -->
 							<div class="col-md-4">
-								<label class="control-label">Submit to get approval from admin.</label>
+								<label class="control-label"><?php if($division_id=="SHOP"){echo 'Submit to get approval from admin.';}else{echo '_____________';}?></label>
 								<input class="btn btn-primary btn-block" type="submit" name="topicCreateBtn" value="<?php if($division_id=="SHOP"){echo 'SUBMIT ITEM';}else{echo 'POST';}?>" />
 							</div>
 						</div>

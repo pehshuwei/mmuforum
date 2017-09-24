@@ -28,7 +28,7 @@ if($topic_id)
 			{
 				$report_reason = $_POST['create_report'];
 
-				if(strlen($report_reason)<10) 
+				if(strlen($report_reason)<20) 
 				{
 					$error_report = "Please insert at least 20 characters.";
 				}
@@ -177,7 +177,7 @@ else
 					<form class="form-horizontal" method="post" action="">
 						<div class="form-group <?php if($error_report){ echo 'has-error';}?>">
 							<div class="col-md-12">
-								<textarea placeholder="Report Reason..." class="form-control" name="create_report" maxlength="100" rows="10" required><?php echo nl2br(isset($report_reason)?$report_reason:"");?></textarea>
+								<textarea placeholder="Report Reason..." class="form-control" name="create_report" maxlength="500" rows="10" required><?php echo nl2br(isset($report_reason)?$report_reason:"");?></textarea>
 								<span class="help-block"><?php if($error_report){echo $error_report;}?></span>
 							</div>
 						</div>

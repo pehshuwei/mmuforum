@@ -60,7 +60,7 @@ else
 <html>
 <head>
 	<title>
-		SHOP APPROVAL | MMU FORUM
+		Shop Approval | MMU FORUM
 	</title>
 
 	<meta charset="utf-8">

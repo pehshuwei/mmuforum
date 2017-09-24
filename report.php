@@ -1,280 +1,208 @@
 <!DOCTYPE HTML> 
-<HTML>
-	<HEAD>
-		<title>
-			REPORT | MMU FORUM
-		</title>
+<?php
+include("dataconnection.php");
 
-		<meta charset="utf-8">
-	    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-	    <meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="stylesheet" type="text/css" href="style/FYP_bootstrap.css"/>
-		<link rel="stylesheet" type="text/css" href="style/custom.css"/>
-		
-	</HEAD>
-	<BODY>
+$report_num = "";
 
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-	    <script src="bootstrap_js.js"></script>
+//check whether user has logged in
+if(isset($_SESSION['authenticated'])==false){
+	header('Location: home.php');   
+}
+else
+{
+	//get user id
+	$admin_id = $_SESSION['user_id'];
 
-	    <!-- upheader ==================== -->
- 		<nav class="navbar navbar-default no-margin padding-5px">
- 			<div class="container-fluid">
-	 			<!-- logo ==================== -->
-				<div class="navbar-header col-md-8 col-sm-5 col-xs-5">
-					<a class="navbar-brand"> 
-						<a href="HOME(J).HTML">
-							<img src="img/mmulogo.png" height="40px" name="Home" alt="Home"/>
-						</a>
-						<span class="font-size-20px">F<small>ORUM</small></span>
+	//CHECK whether user is an admin
+	if($admin_id!=1 && $admin_id!=2 && admin_id!=3) 
+	{
+		header('Location: home.php');
+	}
+	else
+	{
+		//get report
+		$sql_report = "select report.report_reason, report.report_timestamp, report.topic_id, topic.topic_title, report.user_id, user.user_name from report inner join topic on report.topic_id=topic.topic_id inner join user on report.user_id=user.user_id";
+		$report = mysqli_query($conn,$sql_report);
+		$report_num = mysqli_num_rows($report);
+
+		if(!$report_num)
+		{
+			$report_num = "0";
+		}
+
+		//Reject item
+		if(isset($_POST['topicDeleteBtn']))
+		{
+			$report_topicid = $_POST['report_topicid'];
+			$sql_deletetopic = "delete from topic where topic_id = '$report_topicid'";
+			mysqli_query($conn,$sql_deletetopic);
+			mysqli_close($conn);
+			header('location: report.php');
+		}
+	}
+}
+
+?>
+
+<html>
+<head>
+	<title>
+		Report | MMU FORUM
+	</title>
+
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="style/FYP_bootstrap.css"/>
+	<link rel="stylesheet" type="text/css" href="style/custom.css"/>
+
+</head>
+<body>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+	<script src="bootstrap_js.js"></script>
+
+	<!-- upheader ==================== -->
+	<nav class="navbar navbar-default no-margin padding-5px">
+		<div class="container-fluid">
+			<!-- logo ==================== -->
+			<div class="navbar-header col-md-8 col-sm-5 col-xs-5">
+				<a class="navbar-brand"> 
+					<a href="home.php">
+						<img src="img/mmulogo.png" height="40px" name="Home" alt="Home"/>
 					</a>
-				    </div>				
+					<span class="font-size-20px">F<small>ORUM</small></span>
+				</a>
+			</div>				
 
-				<!-- search and navigate ====================-->
-				<div class=" nav navbar-nav navbar-right col-md-2 col-sm-7 col-xs-7" >
-				    <ul class="nav nav-pills">
-				    	<li>
-				    		<!--<form class="navbar-form no-margin no-border no-padding" role="search" >
-							    <div class="form-group">
-							        <input type="text" class="form-control" placeholder="Search">
-							    </div>
-						    </form>
-						</li>
-						<li><button type="submit" class="btn btn-default">Search</button></li>-->
-				    	<li><a href="HOME(J).HTML" >HOME</a></li>
-				    	<li><a href="PROFILE.HTML" >PROFILE</a></li>
-					</ul>
-				</div>
-			</div>
-		</nav>
-		
-		<!-- downheader ==================== -->
-		<nav class="navbar navbar-inverse no-border-radius">
-			<div class="container-fluid">
-				<!-- for smaller screan ==================== -->
-			    <div class="navbar-header">
-			    	<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
-				        <span class="sr-only">Toggle navigation</span>
-				        <span class="icon-bar"></span>
-				        <span class="icon-bar"></span>
-				        <span class="icon-bar"></span>
-			    	</button>
-			    </div>
-
-			    <!-- for medium screen ==================== -->
-			    <div class="navbar-collapse collapse" id="bs-example-navbar-collapse-2">
-			    	<ul class="nav navbar-nav">
-				        <li><a href="#">ACCOMMODATION</a></li>
-				        <li><a href="#">FOM</a></li>
-				        <li><a href="#">FOE</a></li>
-				        <li><a href="#">FCM</a></li>
-				        <li><a href="#">FCI</a></li>
-				        <li><a href="#">FAC</a></li>
-				        <li><a href="DIVISION.HTML">CDP</a></li>
-				        <li><a href="SHOP.HTML">SHOP</a></li>
-						<li class="dropdown">
-							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">ADMIN <span class="caret"></span></a>
-							<ul class="dropdown-menu" role="menu">
-								<li><a href="ID VERIFICATION ADMIN.HTML">ID VERIFICATION</a></li>
-								<li><a href="SHOP APPROVAL(J).HTML">SHOP APPROVAL</a></li>
-								<li><a href="REPORT(J).HTML">REPORT</a></li>
-								<li><a href="BLOCKED USER.HTML">BLOCKED USER</a></li>
-							</ul>
-						</li>
-			    	</ul>
-			    </div>
-			</div>
-		</nav>
-		<!-- breadcrumb ==================== -->
-		<div class="row no-margin">
-			<div class="col-md-12">
-				<ul class="breadcrumb">
-					<li><a href="HOME.html">HOME</a></li>
-					<li><a href="#">ADMIN</a></li>
-					<li class="active">REPORT</li>
+			<!-- search and navigate ====================-->
+			<div class=" nav navbar-nav navbar-right col-md-3 col-sm-7 col-xs-7" >
+				<ul class="nav nav-pills">
+					<li><a href="home.php">HOME</a></li>
+					<li><a href="profile.php?user_id=<?php echo $_SESSION['user_id'];?>">PROFILE</a></li>
+					<li><a href="logout.php">LOGOUT</a></li>
 				</ul>
 			</div>
 		</div>
-		
-		<div class="container">
+	</nav>
 
-			 <!-- page header ==================== -->
-			<div class="row">
-		 		<div class="col-md-12">
-					<div class="page-header">
-						<h1>REPORT</h1>
-					</div>
-				</div>
-	        </div>
-        
-                           <!-- item form ==================== -->
-		<div class="container">	
-				<div class="row">
-				<div class="col-md-12">
-					<div class="well">
-                    <div class="media">
-                        	<div class="panel panel-default">
- 
-							<div class="media">
-				
-						<form class="form-horizontal">
-								<!-- item title ==================== -->
-								<div class="form-group">
-									<div class="col-md-3">
-										<h4><strong class="col-md-12 input-lg font-blue">#4- CaptainAmerica</strong></h4>
-					
-									</div>							
-									<div class="col-md-12">
-									
-									<!-- description ==================== -->
-									<div class="col-md-9 col-md-offset-1">
-										<span class="font-red">Emran</span>
-										<br><p>****playing with my emotions</p><br>
-									</div>
-									
-									<!--  button ==================== -->
-									<div class="col-md-2 ">					
-									<a href="DIVISION TOPICS.HTML" class="address">
-											<button type="button" class="btn btn-primary btn-block ">VIEW TOPIC</button>
-									
-									</A>
-									</div>
-									</div>
-							</form>
-					</div>
-					</div>
+	<!-- downheader ==================== -->
+	<nav class="navbar navbar-inverse no-border-radius">
+		<div class="container-fluid">
+			<!-- for smaller screan ==================== -->
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+			</div>
+
+			<!-- for medium screen ==================== -->
+			<div class="navbar-collapse collapse" id="bs-example-navbar-collapse-2">
+				<ul class="nav navbar-nav">
+					<li><a href="division.php?division_id=FOM">FOM</a></li>
+					<li><a href="division.php?division_id=FOE">FOE</a></li>
+					<li><a href="division.php?division_id=FCM">FCM</a></li>
+					<li><a href="division.php?division_id=FCI">FCI</a></li>
+					<li><a href="division.php?division_id=FAC">FAC</a></li>
+					<li><a href="division.php?division_id=CDP">CDP</a></li>
+					<li><a href="division.php?division_id=ACC">ACCOMMODATION</a></li>
+					<li><a href="division.php?division_id=FOOD">FOOD</a></li>
+					<li><a href="division.php?division_id=GEN">GENERAL</a></li>
+					<li><a href="division.php?division_id=SHOP">SHOP</a></li>
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">ADMIN <span class="caret"></span></a>
+						<ul class="dropdown-menu" role="menu">
+							<li><a href="idVerification.php">ID VERIFICATION</a></li>
+							<li><a href="shopApproval.php">SHOP APPROVAL</a></li>
+							<li class="disabled"><a href="#">REPORT</a></li>
+							<li><a href="blockedUser.php">BLOCKED USER</a></li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	<!-- breadcrumb ==================== -->
+	<div class="row no-margin">
+		<div class="col-md-12">
+			<ul class="breadcrumb">
+				<li><a href="home.php">Home</a></li>
+				<li class="active">Admin</li>
+				<li class="active">Report</li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="container">
+		<!-- page header ==================== -->
+		<div class="row">
+			<div class="col-md-12">
+				<div class="page-header">
+					<h1><?php if($report_num>1){echo $report_num.' Reports';}else{echo $report_num.' Report';}?></h1>
 				</div>
 			</div>
 		</div>
-	</div>
-		</div>	
-			<div class="row">
-				<div class="col-md-12">
-					<div class="well">
-                    <div class="media">
-                        	<div class="panel panel-default">
- 
-							<div class="media">
-				
-						<form class="form-horizontal">
-								<!-- item title ==================== -->
+
+		<!-- report list -->
+		<div class="row">
+			<div class="col-md-12">
+				<?php
+
+				while ($row_report=mysqli_fetch_assoc($report)) 
+				{
+					echo '<div class="panel panel-default">
+					<div class="panel-body text">
+						<div class="col-md-9 col-sm-12 col-xs-12">
+							<h2>'.nl2br($row_report['topic_title']).'</h2>
+						</div>
+					</div>
+					<div class="panel-body text">
+						<div class="col-md-9">
+							<p class="text-info">Report reason</p>
+							<blockquote><p>'.nl2br($row_report['report_reason']).'</p></blockquote>
+							<p>Reported by <a href="profile.php?user_id='.$row_report['user_id'].'">'.$row_report['user_name'].'</a> | '.$row_report['report_timestamp'].'</p>
+						</div>
+						<div class="col-md-2 col-sm-12 col-xs-12 pull-right">
+							<form><div class="form-group">
+								<a href="topic.php?topic_id='.$row_report['topic_id'].'" class="btn btn-primary btn-block">View Topic</a>
+							</div></form>
+							<form method="post" action="" onsubmit="return topicDeleteConfirmation()";>
 								<div class="form-group">
-									<div class="col-md-3">
-										<h4><strong class="col-md-12 input-lg font-blue">#3 - WillyWonka</strong></h4>
-					
-									</div>							
-									<div class="col-md-12">
-									<!-- description ==================== -->
-									<div class="col-md-9 col-md-offset-1">
-									    <span class="font-red">Emran</span>
-										<P>****irrelevant pictures</p>
-									</div>
-									<!--  button ==================== -->
-									<div class="col-md-2 ">					
-									<div class="address">
-											<button type="button" class="btn btn-primary btn-block " >VIEW TOPIC</button>
-									</div>
-									
-									</div>
-									</div>
+									<input type="submit" class="btn btn-primary btn-block" name="topicDeleteBtn" value="Delete Topic"/>
+									<input type="hidden" name="report_topicid" value="'.$row_report['topic_id'].'" />
 								</div>
 							</form>
+						</div>
 					</div>
-				</div>
-			</div>
-		</div>
-
-        
-                           <!-- item form ==================== -->
-		
-			<div class="row">
-				<div class="col-md-12">
-					<div class="well">
-                    <div class="media">
-                        	<div class="panel panel-default">
- 
-							<div class="media">
-				
-						<form class="form-horizontal">
-								<!-- item title ==================== -->
-								<div class="form-group">
-									<div class="col-md-3">
-										<h4><strong class="col-md-12 input-lg font-blue">#2- Legend24</strong></h4>
-					
-									</div>							
-									<div class="col-md-12">
-									
-									<!-- description ==================== -->
-									<div class="col-md-9 col-md-offset-1">
-										<span class="font-red">Powerpuff</span>
-										<p>****inappropriate usage of words in the post</p>
-									</div>
-									
-									<!--  button ==================== -->
-									<div class="col-md-2 ">					
-									<div class="address">
-											<button type="button" class="btn btn-primary btn-block ">VIEW TOPIC</button>
-									
-									</div>
-									</div>
-									</div>
-							</form>
-					</div>
-					</div>
-				</div>
-			</div>
-		</div>
+				</div>';
+			}
+			?>
+		</div>				
 	</div>
-		</div>	
-	
-			<div class="row">
-				<div class="col-md-12">
-					<div class="well">
-                    <div class="media">
-                        	<div class="panel panel-default">
- 
-							<div class="media">
-				
-						<form class="form-horizontal">
-								<!-- item title ==================== -->
-								<div class="form-group">
-									<div class="col-md-3">
-										<h4><strong class="col-md-12 input-lg font-blue">#1- Emranpower97</strong></h4>
-					
-									</div>							
-									<div class="col-md-12">
-									
-									<!-- description ==================== -->
-									<div class="col-md-9 col-md-offset-1">
-										<span class="font-red">GreenLantern</span>
-										<p>****spamming</p>
-									</div>
-									
-									<!--  button ==================== -->
-									<div class="col-md-2 ">					
-									<div class="address">
-											<button type="button" class="btn btn-primary btn-block ">VIEW TOPIC</button>
-									
-									</div>
-									</div>
-									</div>
-							</form>
-					</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-				
-	</div>			
- </div>
-	
+</div>
+</div>
 
-	
-        <script data-align="right" data-overlay="false" id="keyreply-script" src="//keyreply.com/chat/widget.js" data-color="#E4392B" data-apps="JTdCJTIyZmFjZWJvb2slMjI6JTIyMTAwMDAwMzU0Njc5MjA0JTIyLCUyMmVtYWlsJTIyOiUyMnNodXdlaS5wZWhAZ21haWwuY29tJTIyJTdE"></script>
-		
-	
-                      
-		</div> 
-	</BODY>
-</HTML>
+<script data-align="right" data-overlay="false" id="keyreply-script" src="//keyreply.com/chat/widget.js" data-color="#E4392B" data-apps="JTdCJTIyZmFjZWJvb2slMjI6JTIyMTAwMDAwMzU0Njc5MjA0JTIyLCUyMmVtYWlsJTIyOiUyMnNodXdlaS5wZWhAZ21haWwuY29tJTIyJTdE"></script>
+</body>
+</html>
+
+<script type="text/javascript">
+
+	function topicDeleteConfirmation()
+	{
+		if(confirm("Are you sure you want to delete this topic? Action cannot be undone."))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+</script>

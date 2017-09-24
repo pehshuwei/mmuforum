@@ -141,7 +141,7 @@ else
 <html>
 <head>
 	<title>
-		PROFILE EDIT | MMU FORUM
+		Edit Profile | MMU FORUM
 	</title>
 
 	<meta charset="utf-8">
