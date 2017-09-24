@@ -6,43 +6,49 @@ $profile_id = $_REQUEST["user_id"];
 $label = '';
 $nav_col = '';
 
-//check whether user_id exists
 if($profile_id)
 {
 	$sql_searchprofile = "select * from user where user_id = '$profile_id'";
 	$search_profile = mysqli_query($conn,$sql_searchprofile);
-	$row = mysqli_fetch_assoc($search_profile);
-
-	//set user_id for users those are not logged in
-	if (isset($_SESSION['authenticated']))
+	
+	//check whether user_id existed
+	if ($row = mysqli_fetch_assoc($search_profile)) 
 	{
-		//to check user status
-		$user_id = $_SESSION['user_id'];
-		$sql_checkstatus = "select user_status from user where user_id='$user_id'";
-		$check_status = mysqli_query($conn,$sql_checkstatus);
-		$row_user=mysqli_fetch_assoc($check_status);
+		//set user_id for users those are not logged in
+		if (isset($_SESSION['authenticated']))
+		{
+			//to check user status
+			$user_id = $_SESSION['user_id'];
+			$sql_checkstatus = "select user_status from user where user_id='$user_id'";
+			$check_status = mysqli_query($conn,$sql_checkstatus);
+			$row_user=mysqli_fetch_assoc($check_status);
 
-		if($user_id!=$profile_id)
-		{	$nav_col = 'col-md-3';}
+			if($user_id!=$profile_id)
+			{	$nav_col = 'col-md-3';}
+			else
+			{	$nav_col = 'col-md-2';}
+		}
 		else
-		{	$nav_col = 'col-md-2';}
+		{
+			$_SESSION['user_id'] = '0';
+			$nav_col = 'col-md-1';
+		}
+
+		if($row['user_status'] == 'VISITOR')
+		{	$label = 'label-default';}
+		else if($row['user_status'] == 'PENDING')
+		{	$label = 'label-warning';}
+		else if($row['user_status'] == 'STUDENT')
+		{	$label = 'label-success';}
+		else if($row['user_status'] == 'BLOCKED')
+		{	$label = 'label-primary';}
+		else if($row['user_status'] == 'ADMIN')
+		{	$label = 'label-info';}		
 	}
 	else
 	{
-		$_SESSION['user_id'] = '0';
-		$nav_col = 'col-md-1';
+		header('location: home.php');
 	}
-
-	if($row['user_status'] == 'VISITOR')
-	{	$label = 'label-default';}
-	else if($row['user_status'] == 'PENDING')
-	{	$label = 'label-warning';}
-	else if($row['user_status'] == 'STUDENT')
-	{	$label = 'label-success';}
-	else if($row['user_status'] == 'BLOCKED')
-	{	$label = 'label-primary';}
-	else if($row['user_status'] == 'ADMIN')
-	{	$label = 'label-info';}		
 }
 else
 {

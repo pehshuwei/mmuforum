@@ -239,10 +239,14 @@ else
 								if($owner_id == $user_id)
 								{
 									echo '<form method="post" action="" onsubmit="return topicDeleteConfirmation()";>
-									<div class="form-group">
+										<div class="form-group">
 										<input type="submit" class="btn btn-danger btn-sm btn-block" name="topicDeleteBtn" value="DELETE"/>
-									</div>
-								</form>';
+										</div>
+										</form>';
+								}
+								else
+								{
+									echo '<a href="reportReason.php?topic_id='.$topic_id.'" class="btn btn-danger btn-sm btn-block">REPORT</a>';
 								}
 							}
 							?>

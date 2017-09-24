@@ -5,6 +5,7 @@ include("dataconnection.php");
 if (isset($_SESSION['authenticated']))
 {
 	$user_id= $_SESSION['user_id'];
+	//check user status
 	$sql_checkstatus = "select user_status from user where user_id='$user_id'";
 	$check_status = mysqli_query($conn,$sql_checkstatus);
 	$row=mysqli_fetch_assoc($check_status);
