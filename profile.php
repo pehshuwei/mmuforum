@@ -50,6 +50,15 @@ if($profile_id)
 		$sql_topic = "select * from topic where user_id='$profile_id'";
 		$topic = mysqli_query($conn,$sql_topic);
 		$topic_num = mysqli_num_rows($topic);
+
+		//block user
+		if(isset($_POST['blockUserBtn'])) 
+		{
+			$sql_updatestatus = "update user set user_status='BLOCKED' where user_id='$profile_id'";
+			mysqli_query($conn,$sql_updatestatus);
+			mysqli_close($conn);
+			header('location: profile.php?user_id='.$profile_id);
+		}
 	}
 	else
 	{
@@ -147,7 +156,7 @@ else
 						echo '<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">ADMIN <span class="caret"></span></a>
 						<ul class="dropdown-menu" role="menu">
-							<li><a href="idVerification.php">ID VERIFICATION</a></li>
+							<li><a href="idVerification_Admin.php">ID VERIFICATION</a></li>
 							<li><a href="shopApproval.php">SHOP APPROVAL</a></li>
 							<li><a href="report.php">REPORT</a></li>
 							<li><a href="blockedUser.php">BLOCKED USER</a></li>
@@ -237,9 +246,25 @@ else
 
 						<!-- edit button ===================== -->
 						<?php
-						if ($user_id== $profile_id)
+						if ($user_id == $profile_id)
 						{
 							echo '<div class="col-md-1"><a href="profileEdit.php?user_id='.$profile_id.'" class="btn btn-default">EDIT</a></div>';
+						}
+						else
+						{
+							if($row_user['user_status'] == 'ADMIN')
+							{
+								if($row_profile['user_status'] != 'ADMIN')
+								{
+									echo '<div class="col-md-1">
+										<form method="post" action="" onsubmit="return blockUserConfirmation()";>
+											<div class="form-group">
+												<input type="submit" class="btn btn-primary btn-block" name="blockUserBtn" value="BLOCK"/>
+											</div>
+										</form>
+									</div>';
+								}
+							}
 						}
 						?>
 					</div>
@@ -309,3 +334,17 @@ else
 <script data-align="right" data-overlay="false" id="keyreply-script" src="//keyreply.com/chat/widget.js" data-color="#E4392B" data-apps="JTdCJTIyZmFjZWJvb2slMjI6JTIyMTAwMDAwMzU0Njc5MjA0JTIyLCUyMmVtYWlsJTIyOiUyMnNodXdlaS5wZWhAZ21haWwuY29tJTIyJTdE"></script>
 </body>
 </html>
+
+<script type="text/javascript">
+	function blockUserConfirmation()
+	{
+		if(confirm("Are you sure you want to block this user? Action cannot be undone."))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+</script>

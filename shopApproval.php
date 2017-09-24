@@ -25,7 +25,6 @@ else
 		$sql_item = "select * from topic where division_id='SHOP' and topic_status is NULL";
 		$item = mysqli_query($conn,$sql_item);
 		$item_num = mysqli_num_rows($item);
-
 		if(!$item_num)
 		{
 			$item_num = "0";
@@ -130,7 +129,7 @@ else
 					<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">ADMIN <span class="caret"></span></a>
 						<ul class="dropdown-menu" role="menu">
-							<li><a href="idVerification.php">ID VERIFICATION</a></li>
+							<li><a href="idVerification_Admin.php">ID VERIFICATION</a></li>
 							<li class="disabled"><a href="#">SHOP APPROVAL</a></li>
 							<li><a href="report.php">REPORT</a></li>
 							<li><a href="blockedUser.php">BLOCKED USER</a></li>

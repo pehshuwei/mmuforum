@@ -4,6 +4,7 @@ include("dataconnection.php");
 
 $error = "";
 $login_error = "";
+$blocked_message = "";
 
 //check whether user has logged in
 if(isset($_SESSION['authenticated'])){
@@ -56,21 +57,28 @@ else
 	//LOGIN
 	if(isset($_POST["loginBtn"]))
 	{
-		$user_email = $_POST["login_email"];
-		$user_pwd = $_POST["login_pwd"];
+		$login_email = $_POST["login_email"];
+		$login_pwd = $_POST["login_pwd"];
 
-		$sql_loginCheck = "select * from user where user_email = '$user_email' and user_pwd = '$user_pwd'";
+		$sql_loginCheck = "select * from user where user_email = '$login_email' and user_pwd = '$login_pwd'";
 		$check_user = mysqli_query($conn,$sql_loginCheck);
 
 		if($row=mysqli_fetch_assoc($check_user))
 		{
-			$_SESSION['user_id'] = $row['user_id'];
-			$_SESSION['authenticated'] = true;
-			if($row['user_status'] == 'ADMIN' || $row['user_status'] == 'STUDENT')
+			if($row['user_status'] == 'BLOCKED')
 			{
-				$_SESSION['verified'] = true;
+				$blocked_message = "You have been blocked. Contact admin for more information.";
 			}
-			header("Location: home.php");	
+			else
+			{
+				$_SESSION['user_id'] = $row['user_id'];
+				$_SESSION['authenticated'] = true;
+				if($row['user_status'] == 'ADMIN' || $row['user_status'] == 'STUDENT')
+				{
+					$_SESSION['verified'] = true;
+				}
+				header("Location: home.php");
+			}
 		}
 		else
 		{
@@ -124,7 +132,7 @@ else
 	<div class="container" style="margin-top:50px;">
 
 		<div class="row">
-			<P class="signUpSuccess"><?php if(isset($_SESSION['signUpSuccess'])){ echo 'Your sign up is successful! Login now!'; } ?><?php if(isset($_SESSION['updatePwdSuccess'])){ echo 'Your password has changed! Login again!'; } ?></P>
+			<P class="signUpSuccess"><?php if(isset($_SESSION['signUpSuccess'])){ echo 'Your sign up is successful! Login now!'; } ?><?php if(isset($_SESSION['updatePwdSuccess'])){ echo 'Your password has changed! Login again!'; } ?><?php if($blocked_message){echo '<span class="text-primary">'.$blocked_message.'</span>';}?></P>
 		</div>
 
 		<!-- LOGIN -->

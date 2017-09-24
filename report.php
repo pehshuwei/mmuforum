@@ -21,21 +21,30 @@ else
 	else
 	{
 		//get report
-		$sql_report = "select report.report_reason, report.report_timestamp, report.topic_id, topic.topic_title, report.user_id, user.user_name from report inner join topic on report.topic_id=topic.topic_id inner join user on report.user_id=user.user_id";
+		$sql_report = "select report.report_id, report.report_reason, report.report_timestamp, report.topic_id, topic.topic_title, report.user_id, user.user_name from report inner join topic on report.topic_id=topic.topic_id inner join user on report.user_id=user.user_id";
 		$report = mysqli_query($conn,$sql_report);
 		$report_num = mysqli_num_rows($report);
-
 		if(!$report_num)
 		{
 			$report_num = "0";
 		}
 
-		//Reject item
+		//delete topic
 		if(isset($_POST['topicDeleteBtn']))
 		{
 			$report_topicid = $_POST['report_topicid'];
 			$sql_deletetopic = "delete from topic where topic_id = '$report_topicid'";
 			mysqli_query($conn,$sql_deletetopic);
+			mysqli_close($conn);
+			header('location: report.php');
+		}
+
+		//delete report
+		if(isset($_POST['reportDeleteBtn']))
+		{
+			$report_id = $_POST['report_id'];
+			$sql_deletereport = "delete from report where report_id = '$report_id'";
+			mysqli_query($conn,$sql_deletereport);
 			mysqli_close($conn);
 			header('location: report.php');
 		}
@@ -117,7 +126,7 @@ else
 					<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">ADMIN <span class="caret"></span></a>
 						<ul class="dropdown-menu" role="menu">
-							<li><a href="idVerification.php">ID VERIFICATION</a></li>
+							<li><a href="idVerification_Admin.php">ID VERIFICATION</a></li>
 							<li><a href="shopApproval.php">SHOP APPROVAL</a></li>
 							<li class="disabled"><a href="#">REPORT</a></li>
 							<li><a href="blockedUser.php">BLOCKED USER</a></li>
@@ -170,12 +179,18 @@ else
 						</div>
 						<div class="col-md-2 col-sm-12 col-xs-12 pull-right">
 							<form><div class="form-group">
-								<a href="topic.php?topic_id='.$row_report['topic_id'].'" class="btn btn-primary btn-block">View Topic</a>
+								<a href="topic.php?topic_id='.$row_report['topic_id'].'" class="btn btn-info btn-block">View Topic</a>
 							</div></form>
 							<form method="post" action="" onsubmit="return topicDeleteConfirmation()";>
 								<div class="form-group">
 									<input type="submit" class="btn btn-primary btn-block" name="topicDeleteBtn" value="Delete Topic"/>
 									<input type="hidden" name="report_topicid" value="'.$row_report['topic_id'].'" />
+								</div>
+							</form>
+							<form method="post" action="" onsubmit="return reportDeleteConfirmation()";>
+								<div class="form-group">
+									<input type="submit" class="btn btn-default btn-block" name="reportDeleteBtn" value="Delete Report"/>
+									<input type="hidden" name="report_id" value="'.$row_report['report_id'].'" />
 								</div>
 							</form>
 						</div>
@@ -193,10 +208,20 @@ else
 </html>
 
 <script type="text/javascript">
-
 	function topicDeleteConfirmation()
 	{
 		if(confirm("Are you sure you want to delete this topic? Action cannot be undone."))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	function reportDeleteConfirmation()
+	{
+		if(confirm("Are you sure you want to delete this report? Action cannot be undone."))
 		{
 			return true;
 		}
