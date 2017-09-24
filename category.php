@@ -3,9 +3,7 @@
 include("dataconnection.php");
 
 $division_id = $_REQUEST['division_id'];
-$error_title = "";
-$error_desc = "";
-$itemprice = "";
+$error_category = "";
 
 if($division_id)
 {
@@ -32,54 +30,21 @@ if($division_id)
 			$check_status = mysqli_query($conn,$sql_checkstatus);
 			$row_user = mysqli_fetch_assoc($check_status);
 
-			//get category
-			$sql_category = "select * from category where division_id='$division_id'";
-			$category = mysqli_query($conn,$sql_category);
-
-			//topicCreate
-			if(isset($_POST["topicCreateBtn"]))
+			if(isset($_POST['categoryCreateBtn'])) 
 			{
-				$topic_title = $_POST['create_title'];
-				$topic_desc = $_POST['create_desc'];
-				$create_itemprice = $_POST['create_itemprice'];
-				$category_id = $_POST['create_category'];
+				$category = $_POST['create_category'];
+				$category = strtoupper($category);
 
-				//format price input
-				if(isset($create_itemprice))
+				if(strlen($category)<3)
 				{
-					$itemprice = number_format($create_itemprice, 2, '.', '');
-					$itemprice = $itemprice;
-					$topic_itemprice = $itemprice;
+					$error_category = "Please insert at least 3 characters";
 				}
 				else
 				{
-					$topic_itemprice = "";
-					$itemprice = "";
-				}
-
-				//topicCreate validation
-				if(strlen($topic_title)<10)
-				{
-					$error_title = "Please insert at least 10 characters.";
-					
-				}
-				else if(strlen($topic_desc)<10)
-				{
-					$error_title = "";
-					$error_desc = "Please insert at least 10 characters.";
-					
-				}
-				else
-				{
-					$sql_inserttopic = "insert into topic(topic_title, topic_desc, topic_timestamp, topic_itemprice, user_id, division_id, category_id) 
-					values('$topic_title', '$topic_desc', now(), '$topic_itemprice','$user_id', '$division_id', '$category_id')";
-
-					//get topic id
-					if (mysqli_query($conn,$sql_inserttopic)) {
-						$topic_id = mysqli_insert_id($conn);
-					}
+					$sql_insertcategory = "insert into category(category, division_id) values('$category', '$division_id')";
+					mysqli_query($conn,$sql_insertcategory);
 					mysqli_close($conn);
-					header('location: topic.php?topic_id='.$topic_id);
+					header('location: topicCreate.php?division_id='.$division_id);
 				}
 			}
 		}
@@ -95,7 +60,7 @@ else
 <html>
 <head>
 	<title>
-		<?php if($division_id=="SHOP"){echo 'SELL AN ITEM';}else{echo 'CREATE TOPIC';}?> | MMU FORUM
+		Add category | MMU FORUM
 	</title>
 
 	<meta charset="utf-8">
@@ -196,7 +161,8 @@ else
 		<ul class="breadcrumb">
 			<li><a href="home.php">HOME</a></li>
 			<li><a href="division.php?division_id=<?php echo $division_id;?>"><?php echo $row_div['division_name'];?></a></li>
-			<li class="active"><?php if($division_id=="SHOP"){echo 'Sell An Item';}else{echo 'Create Topic';}?></li>
+			<li><a href="topicCreate.php?division_id=<?php echo $division_id;?>">Create Topic</a></li>
+			<li class="active">Add category</li>
 		</ul>
 	</div>
 </div>
@@ -208,7 +174,7 @@ else
 	<div class="row">
 		<div class="col-md-12">
 			<div class="page-header">
-				<h1><?php if($division_id=="SHOP"){echo 'SELL AN ITEM';}else{echo 'CREATE TOPIC';}?></h1>
+				<h1>Adding category to <?php echo $row_div['division_name'];?></h1>
 			</div>
 		</div>
 	</div>
@@ -218,55 +184,19 @@ else
 	<div class="row">
 		<div class="col-md-12">
 			<div class="well">
-				<form class="form-horizontal" method="post" action="">
-
+				<form class="form-horizontal" method="post" action="" onsubmit="return categoryCreateConfirmation()">
 					<!-- topic title ==================== -->
-					<div class="form-group <?php if($error_title){echo 'has-error';}?>">
+					<div class="form-group <?php if($error_category){echo 'has-error';}?>">
 						<div class="col-md-12">
-							<input type="text" class="form-control" name="create_title" placeholder="<?php if($division_id=="SHOP"){echo 'ITEM NAME';}else{echo 'TITLE';}?>" maxlength="100" value="<?php echo isset($topic_title)?$topic_title:"";?>" required/>
-							<span class="help-block"><?php if($error_title){echo $error_title;}?></span>
+							<input type="text" class="form-control" name="create_category" placeholder="Enter category" maxlength="25" value="<?php echo isset($category)?$category:"";?>" required/>
+							<span class="help-block"><?php if($error_category){echo $error_category;}?></span>
 						</div>
 					</div>
-
-					<!-- topic description -->
-					<div class="form-group <?php if($error_desc){echo 'has-error';}?>">
-						<div class="col-md-12">
-							<textarea placeholder="DESCRIPTION" class="form-control" name="create_desc" maxlength="1000" rows="10" required><?php echo isset($topic_desc)?$topic_desc:"";?></textarea>
-							<span class="help-block"><?php if($error_desc){echo $error_desc;}?></span>
-						</div>
-					</div>
-
 
 					<div class="form-group">
-						<!-- category ==================== -->
-						<div class="col-md-4">
-							<label class="control-label">CATEGORY</label>
-							<select class="form-control" name="create_category">
-								<option>NONE</option>
-								<?php
-									while($row_cat=mysqli_fetch_assoc($category)) 
-									{
-										echo '<option value="'.$row_cat['category_id'].'">'.$row_cat['category'].'</option>';
-									}
-								?>
-							</select>
-							<p class="text-danger">Don't have what you need? <a href="category.php?division_id=<?php echo $division_id;?>">Add here!</a></p>
-						</div>
-
-						<!-- price ==================== -->
-						<div class="col-md-4">
-							<?php 
-							if($division_id=="SHOP")
-								{	echo '<label class="control-label">RM</label>
-							<input type="number" value="'.$itemprice.'" placeholder="0.00" max="1000000.00" min="0.50" step="0.05" data-number-to-fixed="2" data-number-stepfactor="100" class="form-control" name="create_itemprice" required/>';
-						}
-						?>										
-						</div>
-
-						<!-- sell button ==================== -->
-						<div class="col-md-4">
-							<label class="control-label"><?php if($division_id=="SHOP"){echo 'Submit to get approval from admin.';}else{echo '_____________';}?></label>
-							<input class="btn btn-primary btn-block" type="submit" name="topicCreateBtn" value="<?php if($division_id=="SHOP"){echo 'SUBMIT ITEM';}else{echo 'POST';}?>" />
+						<!-- add category button ==================== -->
+						<div class="col-md-4 pull-right">
+							<input class="btn btn-primary btn-block" type="submit" name="categoryCreateBtn" value="Add category"/>
 						</div>
 					</div>
 				</form>
@@ -278,36 +208,16 @@ else
 </body>
 </html>
 
-<script>
-	$(document).ready(function() 
+<script type="text/javascript">
+	function categoryCreateConfirmation()
 	{
-		$("#id_image").on('change', function() 
+		if(confirm("Be responsible with what you are adding. Action cannot be undone."))
 		{
-			var countFiles = $(this)[0].files.length;
-			var imgPath = $(this)[0].value;
-			var extn = imgPath.substring(imgPath.lastIndexOf('.') + 1).toLowerCase();
-			var image_holder = $("#id_image_preview");
-			image_holder.empty();
-
-			for (var i = 0; i < countFiles; i++) 
-			{
-				var reader = new FileReader();
-
-				reader.onload = function(e) 
-				{
-					$("<img/>",
-					{
-						"src": e.target.result,
-						"class": "thumb-image",
-						"height": "200px"
-					}).appendTo(image_holder);
-				}
-
-				image_holder.show();
-				reader.readAsDataURL($(this)[0].files[i]);
-			}
-
-		});
-	});
-
-</script>	
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+</script>

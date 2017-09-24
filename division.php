@@ -43,6 +43,10 @@ if($division_id)
 			//get topic
 			$sql_topic = "select topic.topic_id, topic.topic_title, topic.topic_timestamp, topic.topic_itemprice, topic.topic_status, user.user_name from topic inner join user on topic.user_id=user.user_id where topic.division_id='$division_id'";
 			$topic = mysqli_query($conn,$sql_topic);
+
+			//get category
+			$sql_category = "select * from category where division_id='$division_id'";
+			$category = mysqli_query($conn,$sql_category);
 		}
 	}	
 }
@@ -186,18 +190,17 @@ else
 		<div class="list-group">
 			<a href="#" class="list-group-item">All Post</a></li>
 			<a href="#" class="list-group-item">Most Recent</a></li>
-			<a href="#" class="list-group-item">Most Viewer</a></li>
 			<a href="#" class="list-group-item">Most Comment</a></li>
-			<a href="#" class="list-group-item">Trending</a></li>
 		</div>
 		<!--category ==================== -->
 		<div class="list-group">
 			<span class="list-group-item active">CATEGORY</span>
-			<a href="#" class="list-group-item">FYP</a></li>
-			<a href="#" class="list-group-item">Database</a></li>
-			<a href="#" class="list-group-item">JAVA</a></li>
-			<a href="#" class="list-group-item">Program Design</a></li>
-			<a href="#" class="list-group-item">C++</a></li>
+			<?php
+				while($row_cat=mysqli_fetch_assoc($category)) 
+				{
+					echo '<a href="#" class="list-group-item">'.$row_cat['category'].'</a></li>';
+				}
+			?>
 		</div>
 	</div>
 
@@ -222,7 +225,6 @@ else
 					$sql_comment = "select * from comment where topic_id='$topic_id'";
 					$comment = mysqli_query($conn,$sql_comment);
 					$comment_num = mysqli_num_rows($comment);
-
 					if($comment_num>1)
 					{
 						$comment_num = $comment_num.' Comments';
@@ -231,11 +233,24 @@ else
 						$comment_num = $comment_num.' Comment';
 					}
 
+					//get topic category
+					$sql_topiccategory = "select category.category_id, category.category from topic inner join category on topic.category_id=category.category_id where topic_id='$topic_id'";
+					$topiccategory = mysqli_query($conn,$sql_topiccategory);
+					$topic_category = mysqli_fetch_assoc($topiccategory);
+					if($topic_category['category_id']<1)
+					{
+						$topic_category = 'GENERAL';
+					}
+					else
+					{
+						$topic_category = $topic_category['category'];
+					}
+
 					echo '
 					<a href="topic.php?topic_id='.$row_topic['topic_id'].'" class="list-group-item">
 					<p class="lead text-info text">'.$row_topic['topic_title'].'</p>
 					<p><span>'.$topic_itemprice.'</span>
-					<p><b>'.$row_topic['user_name'].'</b> | '.$row_topic['topic_timestamp'].' | <span class="label label-info">FYP</span><span class="badge pull-right">'.$comment_num.'</span></p>
+					<p><b>'.$row_topic['user_name'].'</b> | '.$row_topic['topic_timestamp'].' | <span class="label label-info">'.$topic_category.'</span><span class="badge pull-right">'.$comment_num.'</span></p>
 					</a>		
 					';
 				}

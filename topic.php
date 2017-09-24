@@ -52,6 +52,11 @@ if($topic_id)
 				$comment = mysqli_query($conn,$sql_comment);
 				$comment_num = mysqli_num_rows($comment);
 
+				//get category
+				$sql_getcategory = "select category.category_id, category.category from topic inner join category on topic.category_id=category.category_id where topic_id='$topic_id'";
+				$getcategory = mysqli_query($conn,$sql_getcategory);
+				$row_cat = mysqli_fetch_assoc($getcategory);
+
 				//CHECK whether user has logged in
 				if(isset($_SESSION['authenticated']))
 				{
@@ -252,7 +257,7 @@ else
 							?>
 						</div>
 						<div class="col-md-4 pull-right">
-							<p>By <a href="profile.php?user_id=<?php echo $owner_id?>"><?php echo $row_owner['user_name'];?></a>	| <?php echo $row_topic['topic_timestamp'];?> | <span class="label label-primary"><?php if($comment_num>1){echo $comment_num.' Comments';}else{echo $comment_num.' Comment';}?></span></p>
+							<p>By <a href="profile.php?user_id=<?php echo $owner_id?>"><?php echo $row_owner['user_name'];?></a>	| <?php echo $row_topic['topic_timestamp'];?> | <span class="label label-info"><?php if($row_cat['category_id']<1){echo 'GENERAL';}else{echo $row_cat['category'];}?></span></p>
 						</div>
 					</div>
 				</div>				
