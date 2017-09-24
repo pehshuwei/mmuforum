@@ -26,7 +26,7 @@ else
 			{	$label = 'label-default';}
 		else if($row['user_status'] == 'PENDING')
 			{	$label = 'label-warning';}
-		else if($row['user_status'] == 'STUDENT')
+		else if($row['user_status'] == 'MMU-ians')
 			{	$label = 'label-success';}
 		else if($row['user_status'] == 'BLOCKED')
 			{	$label = 'label-primary';}
@@ -216,7 +216,7 @@ else
 						echo '<li class="dropdown">
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">ADMIN <span class="caret"></span></a>
 								<ul class="dropdown-menu" role="menu">
-									<li><a href="idVerification_Admin.php">ID VERIFICATION</a></li>
+									<li><a href="idVerification.php">ID VERIFICATION</a></li>
 									<li><a href="shopApproval.php">SHOP APPROVAL</a></li>
 									<li><a href="report.php">REPORT</a></li>
 									<li><a href="blockedUser.php">BLOCKED USER</a></li>
@@ -304,7 +304,17 @@ else
 								</div>
 
 								<div class="form-group">
-									STATUS | <span class="label <?php echo $label; ?>"><?php echo $row['user_status'];?></span> <a href="ID VERIFICATION USER.HTML"> Change status</a>
+									STATUS | <span class="label <?php echo $label;?>"><?php echo $row['user_status'];?></span>  
+									<?php 
+									if($row['user_status']=='VISITOR')
+									{
+										echo '<a href="changeStatus.php">Change status</a>
+											<p class="text-info">____________________
+											<br>Why have to change status?
+											<br>With status <span class="label label-default">VISITOR</span>, you can only create topics and comments.
+											<br>With status <span class="label label-success">MMU-ians</span>, you can access to SHOP selling activities.</p>';
+									}
+									?>
 								</div>
 
 								<div class="form-group">

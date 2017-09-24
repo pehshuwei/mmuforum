@@ -73,7 +73,7 @@ else
 			{
 				$_SESSION['user_id'] = $row['user_id'];
 				$_SESSION['authenticated'] = true;
-				if($row['user_status'] == 'ADMIN' || $row['user_status'] == 'STUDENT')
+				if($row['user_status'] == 'ADMIN' || $row['user_status'] == 'MMU-ians')
 				{
 					$_SESSION['verified'] = true;
 				}

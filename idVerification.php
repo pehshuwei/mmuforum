@@ -1,8 +1,8 @@
-<!DOCTYPE HTML> 
+<!DOCTYPE HTML>
 <?php
 include("dataconnection.php");
 
-$blocked_num = "";
+$request_num = "";
 
 //check whether user has logged in
 if(isset($_SESSION['authenticated'])==false){
@@ -10,7 +10,7 @@ if(isset($_SESSION['authenticated'])==false){
 }
 else
 {
-	//get user id
+	//get admin id
 	$admin_id = $_SESSION['user_id'];
 
 	//CHECK whether user is an admin
@@ -20,23 +20,33 @@ else
 	}
 	else
 	{
-		//get blocked user
-		$sql_blocked = "select user_id, user_name, user_email from user where user_status='BLOCKED'";
-		$blocked = mysqli_query($conn,$sql_blocked);
-		$blocked_num = mysqli_num_rows($blocked);
-		if(!$blocked_num)
+		//get user
+		$sql_request = "select * from user where user_status='PENDING'";
+		$request = mysqli_query($conn,$sql_request);
+		$request_num = mysqli_num_rows($request);
+		if(!$request_num)
 		{
-			$blocked_num = "0";
+			$request_num = "0";
 		}
 
-		//Unblock user
-		if(isset($_POST['unblockBtn']))
+		//approve
+		if(isset($_POST['approveBtn']))
 		{
-			$blocked_id = $_POST['blocked_id'];
-			$sql_updatestatus = "update user set user_status='VISITOR' where user_id='$blocked_id'";
+			$user_id = $_POST['approve_id'];
+			$sql_updatestatus = "update user set user_status='MMU-ians' where user_id='$user_id'";
 			mysqli_query($conn,$sql_updatestatus);
 			mysqli_close($conn);
-			header('location: blockedUser.php');
+			header('location: idVerification.php');
+		}
+
+		//decline
+		if(isset($_POST['declineBtn']))
+		{
+			$user_id = $_POST['decline_id'];
+			$sql_updatestatus = "update user set user_status='VISITOR' where user_id='$user_id'";
+			mysqli_query($conn,$sql_updatestatus);
+			mysqli_close($conn);
+			header('location: idVerification.php');
 		}
 	}
 }
@@ -44,7 +54,7 @@ else
 <html>
 <head>
 	<title>
-		Blocked User | MMU FORUM
+		ID Verification | MMU FORUM
 	</title>
 
 	<meta charset="utf-8">
@@ -114,10 +124,10 @@ else
 					<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">ADMIN <span class="caret"></span></a>
 						<ul class="dropdown-menu" role="menu">
-							<li><a href="idVerification.php">ID VERIFICATION</a></li>
+							<li class="disabled"><a href="#">ID VERIFICATION</a></li>
 							<li><a href="shopApproval.php">SHOP APPROVAL</a></li>
 							<li><a href="report.php">REPORT</a></li>
-							<li class="disabled"><a href="#">BLOCKED USER</a></li>
+							<li><a href="blockedUser.php">BLOCKED USER</a></li>
 						</ul>
 					</li>
 				</ul>
@@ -131,7 +141,7 @@ else
 			<ul class="breadcrumb">
 				<li><a href="home.php">Home</a></li>
 				<li class="active">Admin</li>
-				<li class="active">Blocked User</li>
+				<li class="active">Report</li>
 			</ul>
 		</div>
 	</div>
@@ -141,53 +151,75 @@ else
 		<div class="row">
 			<div class="col-md-12">
 				<div class="page-header">
-					<h1><?php if($blocked_num>1){echo $blocked_num.' blocked users';}else{echo $blocked_num.' blocked user';}?></h1>
+					<h1><?php if($request_num>1){echo $request_num.' Requests';}else{echo $request_num.' Request';}?></h1>
 				</div>
 			</div>
 		</div>
 
-		<!-- blocked user list ==================== -->
+		<!-- requests ==================== -->
 		<div class="row">
-			<div class="col-md-12">
-				<div class="well">
-					<?php
-					while ($row_blocked=mysqli_fetch_assoc($blocked)) 
-					{
-						echo '
-						<div class="panel panel-dafault">
-							<div class="panel-body">
-								<div class="col-md-8 lead">
-									'.$row_blocked['user_email'].'
+			<?php
+				while($row_request=mysqli_fetch_assoc($request)) 
+				{
+					echo '
+				<div class="col-sm-6 col-md-4 col-lg-4">
+				<div class="panel panel-default">
+					<div class="panel-body">
+						<div class="col-md-12">
+							<img src="data:image;base64,'.$row_request['user_idphoto'].'" height="300px"/>
+						</div>
+						<div class="col-md-12">
+							<p>'.$row_request['user_name'].'</p>
+						</div>
+						<div class="col-md-12">
+							<div class="form-group">
+								<a href="profile.php?user_id='.$row_request['user_id'].'" class="btn btn-info btn-block">View Profile</a>
+							</div>
+						</div>
+						<div class="col-md-12">
+							<form method="post" action="" onsubmit="return approveConfirmation()";>
+								<div class="form-group">
+									<input type="submit" class="btn btn-primary btn-block" name="approveBtn" value="Approve"/>
+									<input type="hidden" name="approve_id" value="'.$row_request['user_id'].'" />
 								</div>
-								<div class="col-md-2">
-									<a href="profile.php?user_id='.$row_blocked['user_id'].'" class="btn btn-info btn-block">View Profile</a>
+							</form>
+						</div>
+						<div class="col-md-12">
+							<form method="post" action="" onsubmit="return declineConfirmation()";>
+								<div class="form-group">
+									<input type="submit" class="btn btn-primary btn-block" name="declineBtn" value="Decline"/>
+									<input type="hidden" name="decline_id" value="'.$row_request['user_id'].'" />
 								</div>
-								<div class="col-md-2">
-									<form method="post" action="" onsubmit="return unblockConfirmation()";>
-										<div class="form-group">
-											<input type="submit" class="btn btn-primary btn-block" name="unblockBtn" value="Unblock"/>
-											<input type="hidden" name="blocked_id" value="'.$row_blocked['user_id'].'" />
-										</div>
-									</form>
-								</div>
-							</div>	        				
-						</div>';
-					}
-					?>
-					
+							</form>
+						</div>
+					</div>
 				</div>
-			</div>
+				</div>
+					';
+				}
+			?>
 		</div>
-
 	</div>
 	<script data-align="right" data-overlay="false" id="keyreply-script" src="//keyreply.com/chat/widget.js" data-color="#E4392B" data-apps="JTdCJTIyZmFjZWJvb2slMjI6JTIyMTAwMDAwMzU0Njc5MjA0JTIyLCUyMmVtYWlsJTIyOiUyMnNodXdlaS5wZWhAZ21haWwuY29tJTIyJTdE"></script>
 </body>
 </html>
 
 <script type="text/javascript">
-	function unblockConfirmation()
+	function approveConfirmation()
 	{
-		if(confirm("Are you sure you want to unblock this user? Action cannot be undone."))
+		if(confirm("Are you sure you want to approve this request? Action cannot be undone."))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	function declineConfirmation()
+	{
+		if(confirm("Are you sure you want to decline this request? Action cannot be undone."))
 		{
 			return true;
 		}
@@ -197,4 +229,3 @@ else
 		}
 	}
 </script>
-

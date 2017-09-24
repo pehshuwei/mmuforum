@@ -39,7 +39,7 @@ if($profile_id)
 			{	$label = 'label-default';}
 		else if($row_profile['user_status'] == 'PENDING')
 			{	$label = 'label-warning';}
-		else if($row_profile['user_status'] == 'STUDENT')
+		else if($row_profile['user_status'] == 'MMU-ians')
 			{	$label = 'label-success';}
 		else if($row_profile['user_status'] == 'BLOCKED')
 			{	$label = 'label-primary';}
@@ -156,7 +156,7 @@ else
 						echo '<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">ADMIN <span class="caret"></span></a>
 						<ul class="dropdown-menu" role="menu">
-							<li><a href="idVerification_Admin.php">ID VERIFICATION</a></li>
+							<li><a href="idVerification.php">ID VERIFICATION</a></li>
 							<li><a href="shopApproval.php">SHOP APPROVAL</a></li>
 							<li><a href="report.php">REPORT</a></li>
 							<li><a href="blockedUser.php">BLOCKED USER</a></li>

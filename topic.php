@@ -196,7 +196,7 @@ else
 							echo '<li class="dropdown">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">ADMIN <span class="caret"></span></a>
 									<ul class="dropdown-menu" role="menu">
-										<li><a href="idVerification_Admin.php">ID VERIFICATION</a></li>
+										<li><a href="idVerification.php">ID VERIFICATION</a></li>
 										<li><a href="shopApproval.php">SHOP APPROVAL</a></li>
 										<li><a href="report.php">REPORT</a></li>
 										<li><a href="blockedUser.php">BLOCKED USER</a></li>

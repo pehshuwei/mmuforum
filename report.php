@@ -14,7 +14,7 @@ else
 	$admin_id = $_SESSION['user_id'];
 
 	//CHECK whether user is an admin
-	if($admin_id!=1 && $admin_id!=2 && admin_id!=3) 
+	if($admin_id!=1 && $admin_id!=2 && $admin_id!=3) 
 	{
 		header('Location: home.php');
 	}
@@ -126,7 +126,7 @@ else
 					<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">ADMIN <span class="caret"></span></a>
 						<ul class="dropdown-menu" role="menu">
-							<li><a href="idVerification_Admin.php">ID VERIFICATION</a></li>
+							<li><a href="idVerification.php">ID VERIFICATION</a></li>
 							<li><a href="shopApproval.php">SHOP APPROVAL</a></li>
 							<li class="disabled"><a href="#">REPORT</a></li>
 							<li><a href="blockedUser.php">BLOCKED USER</a></li>
