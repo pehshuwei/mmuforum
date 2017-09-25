@@ -72,26 +72,42 @@ if($division_id)
 				}
 				else
 				{
-					if(getimagesize($_FILES['image']['tmp_name'])==false)
+					if($division_id=='SHOP')
 					{
-						$error_image = "Please select an image.";
+						if(getimagesize($_FILES['image']['tmp_name'])==false)
+						{
+							$error_image = "Please select an image.";
+						}
+						else
+						{
+							$image = addslashes($_FILES['image']['tmp_name']);
+							$name = addslashes($_FILES['image']['name']);
+							$image = file_get_contents($image);
+							$image = base64_encode($image);
+							$sql_inserttopic = "insert into topic(topic_title, topic_desc, topic_timestamp, topic_itemprice, topic_imgname, topic_img,  user_id, division_id, category_id) 
+							values('$topic_title', '$topic_desc', now(), '$topic_itemprice', '$name', '$image', '$user_id', '$division_id', '$category_id')";
+
+							//get topic id
+							if (mysqli_query($conn,$sql_inserttopic)) {
+								$topic_id = mysqli_insert_id($conn);
+							}
+							mysqli_close($conn);
+							header('location: topic.php?topic_id='.$topic_id);
+						}
 					}
 					else
 					{
-						$image = addslashes($_FILES['image']['tmp_name']);
-						$name = addslashes($_FILES['image']['name']);
-						$image = file_get_contents($image);
-						$image = base64_encode($image);
-						$sql_inserttopic = "insert into topic(topic_title, topic_desc, topic_timestamp, topic_itemprice, topic_imgname, topic_img,  user_id, division_id, category_id) 
-						values('$topic_title', '$topic_desc', now(), '$topic_itemprice', '$name', '$image', '$user_id', '$division_id', '$category_id')";
+						$sql_inserttopic = "insert into topic(topic_title, topic_desc, topic_timestamp, topic_itemprice, user_id, division_id, category_id) 
+							values('$topic_title', '$topic_desc', now(), '$topic_itemprice', '$user_id', '$division_id', '$category_id')";
 
-						//get topic id
-						if (mysqli_query($conn,$sql_inserttopic)) {
-							$topic_id = mysqli_insert_id($conn);
-						}
-						mysqli_close($conn);
-						header('location: topic.php?topic_id='.$topic_id);
+							//get topic id
+							if (mysqli_query($conn,$sql_inserttopic)) {
+								$topic_id = mysqli_insert_id($conn);
+							}
+							mysqli_close($conn);
+							header('location: topic.php?topic_id='.$topic_id);
 					}
+					
 				}
 			}
 		}
@@ -243,20 +259,25 @@ else
 					
 					<div class="form-group <?php if($error_desc){echo 'has-error';}?>">
 						<!-- image ==================== -->
-						<div class="col-md-3">
-							<label class="control-label">IMAGE</label>
-							<div id="topic_image_preview"></div>
-							<br/>
-							<input type="file" name="image" accept=".jpg, .png" id="topic_image"/>
-							<?php
-							if($error_image)
+						<?php
+						if($division_id=='SHOP') 
+						{
+							echo '<div class="col-md-3">
+								<label class="control-label">IMAGE</label>
+								<div id="topic_image_preview"></div>
+								<br/>
+								<input type="file" name="image" accept=".jpg, .png" id="topic_image"/>
+							</div>';
+						}
+						if($error_image)
 							{
 								echo '<span class="text-primary">'.$error_image.'</span>';
 							}
-							?>
-						</div>
+						?>
+						
+						
 						<!-- topic description -->
-						<div class="col-md-9">
+						<div class="<?php if($division_id=='SHOP'){echo 'col-md-9';}else{echo 'col-md-12';}?>">
 							<textarea placeholder="DESCRIPTION" class="form-control" name="create_desc" maxlength="1000" rows="10" required><?php echo isset($topic_desc)?$topic_desc:"";?></textarea>
 							<span class="help-block"><?php if($error_desc){echo $error_desc;}?></span>
 						</div>
