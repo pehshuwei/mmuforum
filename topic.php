@@ -229,6 +229,7 @@ else
 				<div class="panel panel-default">
 					<div class="panel-body text">
 						<h2><?php echo nl2br($row_topic['topic_title']);?></h2>
+						<p><img src="data:image;base64,<?php echo $row_topic['topic_img'];?>" height="300px"/></p>
 						<blockquote><p><?php echo nl2br($row_topic['topic_desc']);?></p></blockquote>						
 						<?php 
 						if($division_id=="SHOP")
@@ -279,7 +280,7 @@ else
 						{
 							//get comment owner
 							$comm_owner_id = $row_comment['user_id'];
-							$sql_comm_owner = "select user_name from user where user_id = '$comm_owner_id'";
+							$sql_comm_owner = "select user_name, user_dp from user where user_id = '$comm_owner_id'";
 							$comm_owner =  mysqli_query($conn,$sql_comm_owner);
 							$row_comm_owner = mysqli_fetch_assoc($comm_owner);
 
@@ -287,7 +288,7 @@ else
 							'<div class="panel panel-default">
 								<div class="panel-body">
 									<div class="col-md-1 icon-user">
-										<img class="img-circle comment-dp" src="img/cat.jpg">
+										<img class="img-circle comment-dp" src="data:image;base64,'.$row_comm_owner['user_dp'].'"/>
 									</div>
 									<div class="col-md-11">
 										<h4><a href="profile.php?user_id='.$comm_owner_id.'">'.$row_comm_owner['user_name'].'</a></h4>

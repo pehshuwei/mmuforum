@@ -199,8 +199,7 @@ else
 					<div class="row"><br/>
 						<!-- profile pic =================== -->
 						<div class="col-md-4">
-							<img class="img-circle profile-pic" alt="" src="img/cat.jpg">	
-							<br/>				            
+							<img class="img-circle profile-pic" src="data:image;base64,<?php echo $row_profile['user_dp']; ?>"/>	            
 						</div>
 
 						<!-- profile details =================== -->

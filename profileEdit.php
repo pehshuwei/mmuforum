@@ -1,9 +1,11 @@
 <!DOCTYPE HTML> 
 <?php 
 include("dataconnection.php");
+$error_image = "";
 
 //check whether user has logged in
-if(isset($_SESSION['authenticated'])==false){
+if(isset($_SESSION['authenticated'])==false)
+{
 	header('Location: home.php');   
 }
 else
@@ -124,8 +126,38 @@ else
 				$_SESSION['updatePwdSuccess'] = true;
 				header('location: login.php');
 			}
+		}
 
-
+		//SUBMIT PHOTO
+		if(isset($_POST['submitPhotoBtn']))
+		{
+			if(getimagesize($_FILES['image']['tmp_name'])==false)
+			{
+				$error_image = "Please select an image.";
+			}
+			else
+			{
+				$image = addslashes($_FILES['image']['tmp_name']);
+				$name = addslashes($_FILES['image']['name']);
+				$image = file_get_contents($image);
+				$image = base64_encode($image);
+				
+				$sql_insertimage = "update user set user_dpname='$name', user_dp='$image' where user_id='$user_id'";
+				$insertimage = mysqli_query($conn,$sql_insertimage);
+				if($insertimage)
+				{
+					?>
+					<script type="text/javascript">alert('Image uploaded');</script>
+					<?php
+					header('location: profileEdit.php?user_id='.$user_id);
+				}
+				else
+				{
+					?>
+					<script type="text/javascript">alert('Image not uploaded.');</script>
+					<?php
+				}
+			}
 		}
 	}
 	else
@@ -256,18 +288,34 @@ else
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-body">
+						<!-- profile picture -->
+						<form class="form-horizontal" method="post" enctype="multipart/form-data">
+							<div class="col-md-3 pull-left">
+								<label class="control-label">PROFILE PICTURE</label>
+								<div class="form-group">
+
+									<div id="profile_image_preview"><img class="img-circle profile-pic" src="data:image;base64,<?php echo $row['user_dp'];?>" height="200px"/></div>
+									<br/>
+									<input type="file" name="image" accept=".jpg, .png" id="profile_image"/>
+									<?php
+									if($error_image)
+									{
+										echo '<span class="text-primary">'.$error_image.'</span>';
+									}
+									?>
+								</div>
+								
+								<div class="form-group">
+									<div class="col-md-12">
+										<input type="submit" name="submitPhotoBtn" class="btn btn-primary btn-block" value="Change profile picture"/>
+									</div>
+								</div>
+							</div>	
+						</form>
 
 						<!-- profileEditForm =================== -->
 						<form id="profileEditForm" class="form-horizontal" method="post" action="" onsubmit="return profileEditValidation()">
-							<div class="col-md-4">
-								<label class="control-label">PROFILE PICTURE</label>
-								<div id="profile_image_preview"></div>
-								<br/>
-								<input type="file"  name="image" accept=".jpg, .png" id="profile_image"/>
-								<br/>
-							</div>
-
-							<div class="col-md-7">
+							<div class="col-md-8 pull-right">
 								<div class="form-group" id="edit_name">
 									<label class="control-label">NAME</label>
 									<input type="text" class="form-control" name="edit_name" id="edit_name_input" maxlength="20" value="<?php echo $row['user_name'];?>" required/>
@@ -326,7 +374,7 @@ else
 
 						<!-- passwordEditForm =================== -->
 						<form id="passwordEditForm" class="form-horizontal"  method="post" action="">
-							<div class="col-md-offset-4 col-md-7">
+							<div class="col-md-8 pull-right">
 								<div class="form-group <?php if($error_oldpwd){echo 'has-error';}?>">
 									<label class="control-label">CHANGE PASSWORD</label>
 									<input type="password" class="form-control" name="edit_oldpwd" placeholder="Enter your old password" value="<?php echo isset($edit_oldpwd)?$edit_oldpwd:""; ?>" required/>
@@ -425,7 +473,5 @@ else
 			document.getElementById("edit_email_error").innerHTML = " ";
 			return true;
 		}
-
-
 	}
 </script>

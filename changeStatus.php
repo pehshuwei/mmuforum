@@ -12,6 +12,7 @@ if (isset($_SESSION['authenticated']))
 
 	if($row_user['user_status']=='VISITOR') 
 	{
+		//SUBMIT PHOTO
 		if(isset($_POST['submitPhotoBtn']))
 		{
 			if(getimagesize($_FILES['image']['tmp_name'])==false)

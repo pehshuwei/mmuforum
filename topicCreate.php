@@ -6,6 +6,7 @@ $division_id = $_REQUEST['division_id'];
 $error_title = "";
 $error_desc = "";
 $itemprice = "";
+$error_image = "";
 
 if($division_id)
 {
@@ -71,15 +72,26 @@ if($division_id)
 				}
 				else
 				{
-					$sql_inserttopic = "insert into topic(topic_title, topic_desc, topic_timestamp, topic_itemprice, user_id, division_id, category_id) 
-					values('$topic_title', '$topic_desc', now(), '$topic_itemprice','$user_id', '$division_id', '$category_id')";
-
-					//get topic id
-					if (mysqli_query($conn,$sql_inserttopic)) {
-						$topic_id = mysqli_insert_id($conn);
+					if(getimagesize($_FILES['image']['tmp_name'])==false)
+					{
+						$error_image = "Please select an image.";
 					}
-					mysqli_close($conn);
-					header('location: topic.php?topic_id='.$topic_id);
+					else
+					{
+						$image = addslashes($_FILES['image']['tmp_name']);
+						$name = addslashes($_FILES['image']['name']);
+						$image = file_get_contents($image);
+						$image = base64_encode($image);
+						$sql_inserttopic = "insert into topic(topic_title, topic_desc, topic_timestamp, topic_itemprice, topic_imgname, topic_img,  user_id, division_id, category_id) 
+						values('$topic_title', '$topic_desc', now(), '$topic_itemprice', '$name', '$image', '$user_id', '$division_id', '$category_id')";
+
+						//get topic id
+						if (mysqli_query($conn,$sql_inserttopic)) {
+							$topic_id = mysqli_insert_id($conn);
+						}
+						mysqli_close($conn);
+						header('location: topic.php?topic_id='.$topic_id);
+					}
 				}
 			}
 		}
@@ -218,7 +230,7 @@ else
 	<div class="row">
 		<div class="col-md-12">
 			<div class="well">
-				<form class="form-horizontal" method="post" action="">
+				<form class="form-horizontal" method="post" action=""  enctype="multipart/form-data">
 
 					<!-- topic title ==================== -->
 					<div class="form-group <?php if($error_title){echo 'has-error';}?>">
@@ -228,9 +240,23 @@ else
 						</div>
 					</div>
 
-					<!-- topic description -->
+					
 					<div class="form-group <?php if($error_desc){echo 'has-error';}?>">
-						<div class="col-md-12">
+						<!-- image ==================== -->
+						<div class="col-md-3">
+							<label class="control-label">IMAGE</label>
+							<div id="topic_image_preview"></div>
+							<br/>
+							<input type="file" name="image" accept=".jpg, .png" id="topic_image"/>
+							<?php
+							if($error_image)
+							{
+								echo '<span class="text-primary">'.$error_image.'</span>';
+							}
+							?>
+						</div>
+						<!-- topic description -->
+						<div class="col-md-9">
 							<textarea placeholder="DESCRIPTION" class="form-control" name="create_desc" maxlength="1000" rows="10" required><?php echo isset($topic_desc)?$topic_desc:"";?></textarea>
 							<span class="help-block"><?php if($error_desc){echo $error_desc;}?></span>
 						</div>
@@ -281,12 +307,12 @@ else
 <script>
 	$(document).ready(function() 
 	{
-		$("#id_image").on('change', function() 
+		$("#topic_image").on('change', function() 
 		{
 			var countFiles = $(this)[0].files.length;
 			var imgPath = $(this)[0].value;
 			var extn = imgPath.substring(imgPath.lastIndexOf('.') + 1).toLowerCase();
-			var image_holder = $("#id_image_preview");
+			var image_holder = $("#topic_image_preview");
 			image_holder.empty();
 
 			for (var i = 0; i < countFiles; i++) 
@@ -299,7 +325,7 @@ else
 					{
 						"src": e.target.result,
 						"class": "thumb-image",
-						"height": "200px"
+						"width": "250px"
 					}).appendTo(image_holder);
 				}
 

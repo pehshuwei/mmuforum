@@ -182,6 +182,11 @@ else
 					</div>
 					<div class="panel-body text">
 						<div class="col-md-9">
+							<img src="data:image;base64,'.$row_item['topic_img'].'" height="300px"/>
+						</div>
+					</div>
+					<div class="panel-body text">
+						<div class="col-md-9">
 							<blockquote><p>'.nl2br($row_item['topic_desc']).'</p></blockquote>
 							<p class="text-primary">RM '.$row_item['topic_itemprice'].'</p>
 							<p>By <a href="profile.php?user_id=<?php echo $owner_id?>">'.$row_owner['user_name'].'</a> | '.$row_item['topic_timestamp'].'</p>
