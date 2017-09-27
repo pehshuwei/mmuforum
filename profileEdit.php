@@ -293,7 +293,6 @@ else
 							<div class="col-md-3 pull-left">
 								<label class="control-label">PROFILE PICTURE</label>
 								<div class="form-group">
-
 									<div id="profile_image_preview"><img class="img-circle profile-pic" src="data:image;base64,<?php echo $row['user_dp'];?>" height="200px"/></div>
 									<br/>
 									<input type="file" name="image" accept=".jpg, .png" id="profile_image"/>
@@ -307,7 +306,7 @@ else
 								
 								<div class="form-group">
 									<div class="col-md-12">
-										<input type="submit" name="submitPhotoBtn" class="btn btn-primary btn-block" value="Change profile picture"/>
+										<input type="submit" name="submitPhotoBtn" class="btn btn-primary btn-block" value="Confirm"/>
 									</div>
 								</div>
 							</div>	
@@ -356,7 +355,7 @@ else
 									<?php 
 									if($row['user_status']=='VISITOR')
 									{
-										echo '<a href="changeStatus.php">Change status</a>
+										echo '<a href="changeStatus.php" target="_blank" rel="noopener">Change status</a>
 											<p class="text-info">____________________
 											<br>Why have to change status?
 											<br>With status <span class="label label-default">VISITOR</span>, you can only create topics and comments.

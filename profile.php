@@ -199,7 +199,7 @@ else
 					<div class="row"><br/>
 						<!-- profile pic =================== -->
 						<div class="col-md-4">
-							<img class="img-circle profile-pic" src="data:image;base64,<?php echo $row_profile['user_dp']; ?>"/>	            
+							<img class="img-circle profile-pic" src="<?php if($row_profile['user_dp']){echo 'data:image;base64,'.$row_profile['user_dp'];}else{echo 'img/default.png';}?>"/>	            
 						</div>
 
 						<!-- profile details =================== -->

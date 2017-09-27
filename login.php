@@ -176,7 +176,7 @@ else
 					</div>
 					<div class="form-group <?php if($error){echo 'has-error';}?>" id="signup_email">
 						<label class="control-label">EMAIL</label>
-						<input type="text" class="form-control" name="signup_email" id="signup_email_input" placeholder="Email" value="<?php echo isset($user_email)?$user_email:""; ?>"  required/>
+						<input type="email" class="form-control" name="signup_email" id="signup_email_input" placeholder="Email" value="<?php echo isset($user_email)?$user_email:""; ?>"  required/>
 						<span id="signup_email_error" class="help-block"><?php echo $error; ?></span>
 					</div>
 					<div class="form-group">
@@ -201,6 +201,8 @@ else
 						<input type="password" class="form-control" name="signup_cpwd" id="signup_cpwd_input" placeholder="Confirm your password" required/>
 						<span id="signup_cpwd_error" class="help-block"></span>
 					</div>
+
+					<input class="hidden" type="file" src="img/default.png" height="1px" width="1px" name="image"/>
 
 					<div class="form-group">
 						<input type="submit" name="signUpBtn" value="SIGN UP" class="btn btn-info active pull-right"/>

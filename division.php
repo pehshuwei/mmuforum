@@ -238,7 +238,7 @@ else
 					$topic_category = mysqli_fetch_assoc($topiccategory);
 					if($topic_category['category_id']<1)
 					{
-						$topic_category = 'GENERAL';
+						$topic_category = 'NONE';
 					}
 					else
 					{

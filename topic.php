@@ -5,6 +5,7 @@ include("dataconnection.php");
 $topic_id = $_REQUEST['topic_id'];
 $error_comment = "";
 $error_login = "";
+$user_dp = "";
 
 if($topic_id)
 {
@@ -258,7 +259,7 @@ else
 							?>
 						</div>
 						<div class="col-md-4 pull-right">
-							<p>By <a href="profile.php?user_id=<?php echo $owner_id?>"><?php echo $row_owner['user_name'];?></a>	| <?php echo $row_topic['topic_timestamp'];?> | <span class="label label-info"><?php if($row_cat['category_id']<1){echo 'GENERAL';}else{echo $row_cat['category'];}?></span></p>
+							<p>By <a href="profile.php?user_id=<?php echo $owner_id?>"><?php echo $row_owner['user_name'];?></a> | <?php echo $row_topic['topic_timestamp'];?> | <span class="label label-info"><?php if($row_cat['category_id']<1){echo 'NONE';}else{echo $row_cat['category'];}?></span></p>
 						</div>
 					</div>
 				</div>				
@@ -283,12 +284,20 @@ else
 							$sql_comm_owner = "select user_name, user_dp from user where user_id = '$comm_owner_id'";
 							$comm_owner =  mysqli_query($conn,$sql_comm_owner);
 							$row_comm_owner = mysqli_fetch_assoc($comm_owner);
+							if($row_comm_owner['user_dp'])
+							{
+								$user_dp = "data:image;base64,".$row_comm_owner['user_dp'];
+							}
+							else
+							{
+								$user_dp = "img/default.png";
+							}
 
 							echo 
 							'<div class="panel panel-default">
 								<div class="panel-body">
 									<div class="col-md-1 icon-user">
-										<img class="img-circle comment-dp" src="data:image;base64,'.$row_comm_owner['user_dp'].'"/>
+										<img class="img-circle comment-dp" src="'.$user_dp.'"/>
 									</div>
 									<div class="col-md-11">
 										<h4><a href="profile.php?user_id='.$comm_owner_id.'">'.$row_comm_owner['user_name'].'</a></h4>
