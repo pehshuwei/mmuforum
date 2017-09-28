@@ -40,8 +40,8 @@ if($division_id)
 			//topicCreate
 			if(isset($_POST["topicCreateBtn"]))
 			{
-				$topic_title = $_POST['create_title'];
-				$topic_desc = $_POST['create_desc'];
+				$topic_title = htmlspecialchars($_POST['create_title'], ENT_QUOTES);
+				$topic_desc = htmlspecialchars($_POST['create_desc'], ENT_QUOTES);
 				$create_itemprice = $_POST['create_itemprice'];
 				$category_id = $_POST['create_category'];
 

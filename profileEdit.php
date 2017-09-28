@@ -38,10 +38,10 @@ else
 		//profileEdit
 		if(isset($_POST['profileEditBtn']))
 		{
-			$user_name = $_POST['edit_name'];
+			$user_name = htmlspecialchars($_POST['edit_name'], ENT_QUOTES);
 			$user_email = $_POST['edit_email'];
 			$edit_faculty = $_POST['edit_faculty'];
-			$user_about = $_POST['edit_about'];
+			$user_about = htmlspecialchars($_POST['edit_about'], ENT_QUOTES);
 			$user_link = $_POST['edit_link'];
 
 			switch($edit_faculty)
@@ -88,9 +88,9 @@ else
 		//passwordEdit
 		if(isset($_POST['passwordEditBtn']))
 		{
-			$edit_oldpwd = $_POST['edit_oldpwd'];
-			$edit_newpwd = $_POST['edit_newpwd'];
-			$edit_cnewpwd = $_POST['edit_cnewpwd'];
+			$edit_oldpwd = htmlspecialchars($_POST['edit_oldpwd'], ENT_QUOTES);
+			$edit_newpwd = htmlspecialchars($_POST['edit_newpwd'], ENT_QUOTES);
+			$edit_cnewpwd = htmlspecialchars($_POST['edit_cnewpwd'], ENT_QUOTES);
 			$pwdformat = '/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/';
 
 
@@ -293,7 +293,7 @@ else
 							<div class="col-md-3 pull-left">
 								<label class="control-label">PROFILE PICTURE</label>
 								<div class="form-group">
-									<div id="profile_image_preview"><img class="img-circle profile-pic" src="data:image;base64,<?php echo $row['user_dp'];?>" height="200px"/></div>
+									<div id="profile_image_preview"><img class="img-circle profile-pic" src="<?php if($row['user_dp']){echo 'data:image;base64,'.$row['user_dp'];}else{echo 'img/default.png';}?>" height="200px"/></div>
 									<br/>
 									<input type="file" name="image" accept=".jpg, .png" id="profile_image"/>
 									<?php
@@ -317,7 +317,7 @@ else
 							<div class="col-md-8 pull-right">
 								<div class="form-group" id="edit_name">
 									<label class="control-label">NAME</label>
-									<input type="text" class="form-control" name="edit_name" id="edit_name_input" maxlength="20" value="<?php echo $row['user_name'];?>" required/>
+									<input type="text" class="form-control" name="edit_name" id="edit_name_input" maxlength="20" value="<?php echo htmlspecialchars($row['user_name'], ENT_QUOTES);?>" required/>
 									<span id="edit_name_error" class="help-block"></span>
 								</div>
 
@@ -342,12 +342,13 @@ else
 
 								<div class="form-group">
 									<label class="control-label">ABOUT</label>
-									<textarea class="form-control" rows="3" maxlength="100" name="edit_about"><?php echo $row['user_about'];?></textarea>
+									<textarea class="form-control" rows="3" maxlength="100" name="edit_about"><?php echo htmlspecialchars($row['user_about'], ENT_QUOTES);?></textarea>
 								</div>
 
 								<div class="form-group">
 									<label class="control-label">LINK</label>
-									<input type="text" class="form-control" name="edit_link" maxlength="50" value="<?php echo $row['user_link'];?>"/>
+									<input type="text" class="form-control" name="edit_link" maxlength="50" value="<?php echo $row['user_link'];?>" placeholder=""/>
+									<span class="text-info">Drop a link to your social media profile to let others contact you! *Especially for shop owner :D</span>
 								</div>
 
 								<div class="form-group">

@@ -79,7 +79,7 @@ if($topic_id)
 					//commentCreate
 					if (isset($_POST["commentCreateBtn"])) 
 					{
-						$new_comment = $_POST['new_comment'];
+						$new_comment = htmlspecialchars($_POST['new_comment'], ENT_QUOTES);
 
 						if(strlen($new_comment)<10)
 						{

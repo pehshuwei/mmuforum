@@ -20,7 +20,7 @@ if (isset($_SESSION['authenticated']))
 	<style type="text/css">
 		body{
 			position: absolute;
-			background-image: url("img/test.jpg");
+			background-image: url("img/mmu.jpg");
 			background-repeat: no-repeat;
 			-webkit-background-size: cover;
 			-moz-background-size: cover;
