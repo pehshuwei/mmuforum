@@ -149,10 +149,11 @@ else
 				<a class="navbar-brand"> 
 					<a href="home.php">
 						<img src="img/mmulogo.png" height="40px" name="Home" alt="Home"/>
+					<span class="home-nav">F<small>ORUM</small></span>
 					</a>
-					<span class="font-size-20px">F<small>ORUM</small></span>
+					<span>Alpha</span>
 				</a>
-			</div>				
+			</div>		
 
 			<!-- search and navigate ====================-->
 			<div class=" nav navbar-nav navbar-right <?php if (isset($_SESSION['authenticated'])){echo 'col-md-3';}else{echo 'col-md-2';}?> col-sm-7 col-xs-7" >
@@ -301,7 +302,7 @@ else
 									}
 								?>
 							</select>
-							<p class="text-danger">Don't have what you need? <a href="category.php?division_id=<?php echo $division_id;?>">Add here!</a></p>
+							<!-- <p class="text-danger">Don't have what you need? <a href="category.php?division_id=<?php echo $division_id;?>">Add here!</a></p> -->
 						</div>
 
 						<!-- price ==================== -->

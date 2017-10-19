@@ -98,10 +98,11 @@ else
 				<a class="navbar-brand"> 
 					<a href="home.php">
 						<img src="img/mmulogo.png" height="40px" name="Home" alt="Home"/>
+					<span class="home-nav">F<small>ORUM</small></span>
 					</a>
-					<span class="font-size-20px">F<small>ORUM</small></span>
+					<span>Alpha</span>
 				</a>
-			</div>				
+			</div>		
 
 			<!-- navigate ==================== -->
 			<div class="nav navbar-nav navbar-right <?php if($nav_col){echo $nav_col;}?>  col-sm-7 col-xs-7 no-padding" >

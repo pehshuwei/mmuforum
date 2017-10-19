@@ -3,6 +3,8 @@
 include("dataconnection.php");
 
 $division_id = $_REQUEST['division_id'];
+$_SESSION['division_id'] = $division_id;
+$_SESSION['filter_category'] = "";
 $error_login = "";
 $topic_itemprice = "";
 
@@ -40,13 +42,10 @@ if($division_id)
 				$error_login = true;
 			}
 
-			//get topic
-			$sql_topic = "select topic.topic_id, topic.topic_title, topic.topic_timestamp, topic.topic_itemprice, topic.topic_status, user.user_name from topic inner join user on topic.user_id=user.user_id where topic.division_id='$division_id'";
-			$topic = mysqli_query($conn,$sql_topic);
-
 			//get category
 			$sql_category = "select * from category where division_id='$division_id'";
 			$category = mysqli_query($conn,$sql_category);
+		
 		}
 	}	
 }
@@ -82,10 +81,11 @@ else
 				<a class="navbar-brand"> 
 					<a href="home.php">
 						<img src="img/mmulogo.png" height="40px" name="Home" alt="Home"/>
+					<span class="home-nav">F<small>ORUM</small></span>
 					</a>
-					<span class="font-size-20px">F<small>ORUM</small></span>
+					<span>Alpha</span>
 				</a>
-			</div>				
+			</div>		
 
 			<!-- navigate ====================-->
 			<div class="nav navbar-nav navbar-right <?php if (isset($_SESSION['authenticated'])){echo 'col-md-3';}else{echo 'col-md-2';}?> col-sm-4 col-xs-4" >
@@ -188,8 +188,9 @@ else
 		</div>
 		<!--filter ==================== -->
 		<div class="list-group">
-			<a href="#" class="list-group-item">All Post</a></li>
-			<a href="#" class="list-group-item">Most Comment</a></li>
+			<a href="#" onClick="recp('allpost')" class="list-group-item">All Post</a></li>
+			<a href="#" onClick="recp('mostcomment')" class="list-group-item">Most Comment</a></li>
+			<a href="#" id="default" onClick="recp('allpost')" class="list-group-item hidden"></a></li>
 		</div>
 		<!--category ==================== -->
 		<div class="list-group">
@@ -197,7 +198,7 @@ else
 			<?php
 				while($row_cat=mysqli_fetch_assoc($category)) 
 				{
-					echo '<a href="#" class="list-group-item">'.$row_cat['category'].'</a></li>';
+					echo '<a href="" onClick="recp(\''.$row_cat['category_id'].'\')" class="list-group-item">'.$row_cat['category'].'</a></li>';
 				}
 			?>
 		</div>
@@ -205,57 +206,7 @@ else
 
 	<!-- topics list ==================== -->
 	<div class="col-md-9 col-sm-12 col-xs-12">
-		<div class="list-group">
-		<?php
-			while ($row_topic=mysqli_fetch_assoc($topic)) 
-			{
-				if($division_id=='SHOP' && $row_topic['topic_status']=='') 
-				{} 
-				else
-				{
-					//get item price
-					if($division_id=='SHOP')
-					{
-						$topic_itemprice = 'RM '.$row_topic['topic_itemprice'];
-					}
-
-					//get comment 
-					$topic_id = $row_topic['topic_id'];
-					$sql_comment = "select * from comment where topic_id='$topic_id'";
-					$comment = mysqli_query($conn,$sql_comment);
-					$comment_num = mysqli_num_rows($comment);
-					if($comment_num>1)
-					{
-						$comment_num = $comment_num.' Comments';
-					}else
-					{
-						$comment_num = $comment_num.' Comment';
-					}
-
-					//get topic category
-					$sql_topiccategory = "select category.category_id, category.category from topic inner join category on topic.category_id=category.category_id where topic_id='$topic_id'";
-					$topiccategory = mysqli_query($conn,$sql_topiccategory);
-					$topic_category = mysqli_fetch_assoc($topiccategory);
-					if($topic_category['category_id']<1)
-					{
-						$topic_category = 'NONE';
-					}
-					else
-					{
-						$topic_category = $topic_category['category'];
-					}
-
-					echo '
-					<a href="topic.php?topic_id='.$row_topic['topic_id'].'" class="list-group-item">
-					<p class="lead text-info text">'.$row_topic['topic_title'].'</p>
-					<p><span>'.$topic_itemprice.'</span>
-					<p><b>'.$row_topic['user_name'].'</b> | '.$row_topic['topic_timestamp'].' | <span class="label label-info">'.$topic_category.'</span><span class="badge pull-right">'.$comment_num.'</span></p>
-					</a>		
-					';
-				}
-				
-			}
-		?>
+		<div id="divpostlist" class="list-group">
 		</div>
 	</div>
 </div>
@@ -264,3 +215,21 @@ else
 	<script data-align="right" data-overlay="false" id="keyreply-script" src="//keyreply.com/chat/widget.js" data-color="#E4392B" data-apps="JTdCJTIyZmFjZWJvb2slMjI6JTIyMTAwMDAwMzU0Njc5MjA0JTIyLCUyMmVtYWlsJTIyOiUyMnNodXdlaS5wZWhAZ21haWwuY29tJTIyJTdE"></script>
 </body>
 </html>
+
+<script type="text/javascript">
+
+document.getElementById('default').click();
+
+function recp(filter) {
+	if(!filter)
+	{
+		filter = 'allpost';
+	}
+	else if(!isNaN(filter))
+	{
+		event.preventDefault();
+	}
+
+	$('#divpostlist').load('divisionPostList.php?divpost='+filter);
+}
+</script>
