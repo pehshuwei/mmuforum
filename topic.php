@@ -128,27 +128,32 @@ else
 	<script src="js/bootstrap_js.js"></script>
 
 	<!-- upheader ==================== -->
-	<nav class="navbar navbar-default no-margin padding-5px">
+	<nav class="navbar navbar-default no-margin padding-5px no-border-radius">
 		<div class="container-fluid">
-			<!-- logo ==================== -->
-			<div class="navbar-header col-md-8 col-sm-5 col-xs-5">
-				<a class="navbar-brand"> 
-					<a href="home.php">
-						<img src="img/mmulogo.png" height="40px" name="Home" alt="Home"/>
-					<span class="home-nav">F<small>ORUM</small></span>
-					</a>
-					<span>Alpha</span>
+			<!-- for smaller screan ==================== -->
+			<div class="navbar-header">
+				<!-- logo ==================== -->
+				<a href="home.php">
+					<img src="img/logo.png" height="40px" name="Home" alt="Home"/>
 				</a>
-			</div>			
+				<span>Alpha</span>
 
-			<!-- search and navigate ====================-->
-			<div class=" nav navbar-nav navbar-right <?php if (isset($_SESSION['authenticated'])){echo 'col-md-3';}else{echo 'col-md-2';}?> col-sm-7 col-xs-7" >
-				<ul class="nav nav-pills">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				</button>
+			</div>	
+
+			<!-- for medium screen ==================== -->
+			<div class="nav navbar-nav navbar-right <?php if (isset($_SESSION['authenticated'])){echo 'col-md-3';}else{echo 'col-md-2';}?> col-sm-4 navbar-collapse collapse" id="bs-example-navbar-collapse-1">
+				<ul class="nav navbar-nav">
 					<li><a href="home.php">HOME</a></li>
 					<?php
 					if (isset($_SESSION['authenticated']))
 					{
-						echo '<li><a href="profile.php?user_id='.$user_id.'">PROFILE</a></li>';
+						echo '<li><a href="profile.php?user_id='.$_SESSION['user_id'].'">PROFILE</a></li>';
 						echo '<li><a href="logout.php">LOGOUT</a></li>';
 					}
 					else

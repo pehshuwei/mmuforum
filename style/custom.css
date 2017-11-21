@@ -228,3 +228,7 @@ fieldset[disabled] .form-control {
     }
 }
 /*emran user approve*/
+
+@media (max-width: 767px) {
+
+}

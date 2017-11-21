@@ -40,24 +40,28 @@ if (isset($_SESSION['authenticated']))
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 	<script src="js/bootstrap_js.js"></script>
 
-	<!-- upheader ==================== -->
-	<nav class="navbar navbar-default no-margin padding-5px">
+	<!-- header ==================== -->
+	<nav class="navbar navbar-default no-margin padding-5px no-border-radius">
 		<div class="container-fluid">
-			<!-- logo ==================== -->
-			<div class="navbar-header col-md-8 col-sm-5 col-xs-5">
-				<a class="navbar-brand"> 
-					<a href="home.php">
-						<img src="img/mmulogo.png" height="40px" name="Home" alt="Home"/>
-					<span class="home-nav">F<small>ORUM</small></span>
-					</a>
-					<span>Alpha</span>
+			<!-- for smaller screan ==================== -->
+			<div class="navbar-header">
+				<!-- logo ==================== -->
+				<a href="home.php">
+					<img src="img/logo.png" height="40px" name="Home" alt="Home"/>
 				</a>
-			</div>		
+				<span>Alpha</span>
 
-			<!-- navigate ====================-->
-			<div class=" nav navbar-nav navbar-right <?php if (isset($_SESSION['authenticated'])){if($row['user_status']=='ADMIN'){echo 'col-md-3';}else{echo 'col-md-2';}}else{echo 'col-md-1';}?> col-sm-7 col-xs-7" >
-				<ul class="nav nav-pills">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				</button>
+			</div>	
 
+			<!-- for medium screen ==================== -->
+			<div class=" nav navbar-nav navbar-right <?php if (isset($_SESSION['authenticated'])){if($row['user_status']=='ADMIN'){echo 'col-md-4';}else{echo 'col-md-2';}}else{echo 'col-md-1';}?> col-sm-5 navbar-collapse collapse" id="bs-example-navbar-collapse-2">
+				<ul class="nav navbar-nav">
 					<?php
 					if (isset($_SESSION['authenticated']))
 					{

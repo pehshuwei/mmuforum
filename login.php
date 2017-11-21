@@ -112,18 +112,15 @@ else
 	<nav class="navbar navbar-default no-margin padding-5px">
 		<div class="container-fluid">
 			<!-- logo ==================== -->
-			<div class="navbar-header col-md-8 col-sm-5 col-xs-5">
-				<a class="navbar-brand"> 
-					<a href="home.php">
-						<img src="img/mmulogo.png" height="40px" name="Home" alt="Home"/>
-					<span class="home-nav">F<small>ORUM</small></span>
-					</a>
-					<span>Alpha</span>
+			<div class="navbar-header col-md-11 col-sm-11 col-xs-11">
+				<a href="home.php">
+					<img src="img/logo.png" height="40px" name="Home" alt="Home"/>
 				</a>
+				<span>Alpha</span>
 			</div>		
 
 			<!-- and navigate ====================-->
-			<div class=" nav navbar-nav navbar-right col-md-1 col-sm-7 col-xs-7" >
+			<div class=" nav navbar-nav navbar-right col-md-1 col-sm-1 col-xs-1" >
 				<ul class="nav nav-pills">
 					<li><a href="home.php">HOME</a></li>
 				</ul>
