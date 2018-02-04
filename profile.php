@@ -116,6 +116,18 @@ else
 					<?php
 					if (isset($_SESSION['authenticated']))
 					{
+						if($row_user['user_status'] == 'ADMIN')
+						{							
+							echo '<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">ADMIN <span class="caret"></span></a>
+							<ul class="dropdown-menu" role="menu">
+								<li><a href="idVerification.php">ID VERIFICATION</a></li>
+								<li><a href="shopApproval.php">SHOP APPROVAL</a></li>
+								<li><a href="report.php">REPORT</a></li>
+								<li><a href="blockedUser.php">BLOCKED USER</a></li>
+							</ul>
+							</li>';
+						}
 						if ($user_id!=$profile_id)
 						{
 							echo '<li><a href="profile.php?user_id='.$user_id.'">PROFILE</a></li>';
@@ -157,23 +169,11 @@ else
 					if (isset($_SESSION['verified'])) {
 						echo '<li><a href="division.php?division_id=SHOP">SHOP</a></li>';
 					}
-					if($row_user['user_status'] == 'ADMIN')
-					{							
-						echo '<li class="dropdown">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">ADMIN <span class="caret"></span></a>
-						<ul class="dropdown-menu" role="menu">
-							<li><a href="idVerification.php">ID VERIFICATION</a></li>
-							<li><a href="shopApproval.php">SHOP APPROVAL</a></li>
-							<li><a href="report.php">REPORT</a></li>
-							<li><a href="blockedUser.php">BLOCKED USER</a></li>
-						</ul>
-					</li>';
-				}
-				?>
-			</ul>
+					?>
+				</ul>
+			</div>
 		</div>
-	</div>
-</nav>
+	</nav>
 
 <!-- breadcrumb ==================== -->
 <div class="row no-margin">

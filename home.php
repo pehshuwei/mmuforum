@@ -18,27 +18,41 @@ if (isset($_SESSION['authenticated']))
 	</title>
 
 	<style type="text/css">
-		body{
-			position: absolute;
-			background-image: url("img/mmu.jpg");
-			background-repeat: no-repeat;
-			-webkit-background-size: cover;
-			-moz-background-size: cover;
-			background-size: cover;
-			width: 100%;
-			height: 100%;
-		}
-	</style>
+	img.bg{
+		/* Set rules to fill background */
+		min-height: 100%;
+		min-width: 1024px;
+		
+		/* Set up proportionate scaling */
+		width: 100%;
+		height: auto;
+		
+		/* Set up positioning */
+		position: fixed;
+		top: 0;
+		left: 0;
+	}
 
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" type="text/css" href="style/FYP_bootstrap.css"/>
-	<link rel="stylesheet" type="text/css" href="style/custom.css"/>
+	@media screen and (max-width: 1024px) {
+		/* Specific to this particular image */
+		img.bg {
+			left: 50%;
+			margin-left: -512px;   /* 50% */
+		}
+	}
+</style>
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" type="text/css" href="style/FYP_bootstrap.css"/>
+<link rel="stylesheet" type="text/css" href="style/custom.css"/>
 </head>
 <body>	
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 	<script src="js/bootstrap_js.js"></script>
+
+	<img src="img/mmu.jpg" class="bg">
 
 	<!-- header ==================== -->
 	<nav class="navbar navbar-default no-margin padding-5px no-border-radius">
@@ -52,10 +66,10 @@ if (isset($_SESSION['authenticated']))
 				<span>Alpha</span>
 
 				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
-				<span class="sr-only">Toggle navigation</span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
 				</button>
 			</div>	
 
@@ -68,13 +82,13 @@ if (isset($_SESSION['authenticated']))
 						if($row['user_status'] == 'ADMIN')
 						{							
 							echo '<li class="dropdown">
-								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">ADMIN <span class="caret"></span></a>
-								<ul class="dropdown-menu" role="menu">
-									<li><a href="idVerification.php">ID VERIFICATION</a></li>
-									<li><a href="shopApproval.php">SHOP APPROVAL</a></li>
-									<li><a href="report.php">REPORT</a></li>
-									<li><a href="blockedUser.php">BLOCKED USER</a></li>
-								</ul>
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">ADMIN <span class="caret"></span></a>
+							<ul class="dropdown-menu" role="menu">
+							<li><a href="idVerification.php">ID VERIFICATION</a></li>
+							<li><a href="shopApproval.php">SHOP APPROVAL</a></li>
+							<li><a href="report.php">REPORT</a></li>
+							<li><a href="blockedUser.php">BLOCKED USER</a></li>
+							</ul>
 							</li>';
 						}
 						echo '<li><a href="profile.php?user_id='.$_SESSION['user_id'].'">PROFILE</a></li>';
@@ -92,52 +106,40 @@ if (isset($_SESSION['authenticated']))
 
 	<div class="container" style="margin-top:30px;">
 		<div class="row">
-			<div class="col-md-12">
 
-				<div class="row">
-					<div class="col-md-6">
-						<a href="division.php?division_id=FOM" class="homedivision">Faculty of Management</a>
-					</div>
-					<div class="col-md-6">
-						<a href="division.php?division_id=FOE" class="homedivision">Faculty of Engineering</a>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-md-6">
-						<a href="division.php?division_id=FCM" class="homedivision">Faculty of Creative Multimedia</a>
-					</div>
-					<div class="col-md-6">
-						<a href="division.php?division_id=FCI" class="homedivision">Faculty of Computing and Informatics</a>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-md-6">
-						<a href="division.php?division_id=FAC" class="homedivision">Faculty of Applied Communication</a>
-					</div>
-					<div class="col-md-6">
-						<a href="division.php?division_id=CDP" class="homedivision">Centre for Diploma Programme</a>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-md-6">
-						<a href="division.php?division_id=ACC" class="homedivision">Accomodation</a>
-					</div>
-					<div class="col-md-6">
-						<a href="division.php?division_id=FOOD" class="homedivision">Food</a>
-					</div>
-				</div>
-				<div class="row">
-					<div class="<?php if (isset($_SESSION['verified'])){ echo 'col-md-6'; } else { echo 'col-md-offset-3 col-md-6';} ?>" >
-						<a href="division.php?division_id=GEN" class="homedivision">General</a>
-					</div>
-					<?php
-						if (isset($_SESSION['verified'])) {
-							echo '<div class="col-md-6"><a href="division.php?division_id=SHOP" class="homedivision">Shop</a></div>';
-						}
-					?>
-					
-				</div>
+			<div class="col-md-6">
+				<a href="division.php?division_id=FOM" class="homedivision">Faculty of Management</a>
 			</div>
+			<div class="col-md-6">
+				<a href="division.php?division_id=FOE" class="homedivision">Faculty of Engineering</a>
+			</div>
+			<div class="col-md-6">
+				<a href="division.php?division_id=FCM" class="homedivision">Faculty of Creative Multimedia</a>
+			</div>
+			<div class="col-md-6">
+				<a href="division.php?division_id=FCI" class="homedivision">Faculty of Computing and Informatics</a>
+			</div>
+			<div class="col-md-6">
+				<a href="division.php?division_id=FAC" class="homedivision">Faculty of Applied Communication</a>
+			</div>
+			<div class="col-md-6">
+				<a href="division.php?division_id=CDP" class="homedivision">Centre for Diploma Programme</a>
+			</div>
+			<div class="col-md-6">
+				<a href="division.php?division_id=ACC" class="homedivision">Accomodation</a>
+			</div>
+			<div class="col-md-6">
+				<a href="division.php?division_id=FOOD" class="homedivision">Food</a>
+			</div>
+			<div class="<?php if (isset($_SESSION['verified'])){ echo 'col-md-6'; } else { echo 'col-md-offset-3 col-md-6';} ?>" >
+				<a href="division.php?division_id=GEN" class="homedivision">General</a>
+			</div>
+			<?php
+			if (isset($_SESSION['verified'])) {
+				echo '<div class="col-md-6"><a href="division.php?division_id=SHOP" class="homedivision">Shop</a></div>';
+			}
+			?>
+			
 		</div>
 	</div>
 
