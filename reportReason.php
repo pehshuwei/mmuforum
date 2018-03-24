@@ -41,6 +41,10 @@ if($topic_id)
 				}
 			}
 		}
+		else
+		{
+			header('location: home.php');
+		}
 	}
 	else
 	{
@@ -91,15 +95,20 @@ else
 				<ul class="nav navbar-nav">
 					<li><a href="home.php">HOME</a></li>
 					<?php
-					if (isset($_SESSION['authenticated']))
-					{
-						echo '<li><a href="profile.php?user_id='.$_SESSION['user_id'].'">PROFILE</a></li>';
-						echo '<li><a href="logout.php">LOGOUT</a></li>';
+					if($row_user['user_status'] == 'ADMIN')
+					{							
+						echo '<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">ADMIN <span class="caret"></span></a>
+								<ul class="dropdown-menu" role="menu">
+									<li><a href="idVerification.php">ID VERIFICATION</a></li>
+									<li><a href="shopApproval.php">SHOP APPROVAL</a></li>
+									<li><a href="report.php">REPORT</a></li>
+									<li><a href="blockedUser.php">BLOCKED USER</a></li>
+								</ul>
+							</li>';
 					}
-					else
-					{
-						echo '<li><a href="login.php">LOGIN</a></li>';
-					}
+					echo '<li><a href="profile.php?user_id='.$_SESSION['user_id'].'">PROFILE</a></li>';
+					echo '<li><a href="logout.php">LOGOUT</a></li>';
 					?>
 				</ul>
 			</div>
@@ -134,18 +143,6 @@ else
 					<?php
 					if (isset($_SESSION['verified'])) {
 						echo '<li><a href="division.php?division_id=SHOP">SHOP</a></li>';
-					}
-					if($row_user['user_status'] == 'ADMIN')
-					{							
-						echo '<li class="dropdown">
-							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">ADMIN <span class="caret"></span></a>
-								<ul class="dropdown-menu" role="menu">
-									<li><a href="idVerification.php">ID VERIFICATION</a></li>
-									<li><a href="shopApproval.php">SHOP APPROVAL</a></li>
-									<li><a href="report.php">REPORT</a></li>
-									<li><a href="blockedUser.php">BLOCKED USER</a></li>
-								</ul>
-							</li>';
 					}
 					?>
 				</ul>

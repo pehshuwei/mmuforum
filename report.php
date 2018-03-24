@@ -97,6 +97,15 @@ else
 			<div class="nav navbar-nav navbar-right <?php if (isset($_SESSION['authenticated'])){echo 'col-md-3';}else{echo 'col-md-2';}?> col-sm-4 navbar-collapse collapse" id="bs-example-navbar-collapse-1">
 				<ul class="nav navbar-nav">
 					<li><a href="home.php">HOME</a></li>
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">ADMIN <span class="caret"></span></a>
+						<ul class="dropdown-menu" role="menu">
+							<li><a href="idVerification.php">ID VERIFICATION</a></li>
+							<li><a href="shopApproval.php">SHOP APPROVAL</a></li>
+							<li class="disabled"><a href="#">REPORT</a></li>
+							<li><a href="blockedUser.php">BLOCKED USER</a></li>
+						</ul>
+					</li>
 					<li><a href="profile.php?user_id=<?php echo $_SESSION['user_id'];?>">PROFILE</a></li>
 					<li><a href="logout.php">LOGOUT</a></li>
 				</ul>
@@ -130,15 +139,6 @@ else
 					<li><a href="division.php?division_id=FOOD">FOOD</a></li>
 					<li><a href="division.php?division_id=GEN">GENERAL</a></li>
 					<li><a href="division.php?division_id=SHOP">SHOP</a></li>
-					<li class="dropdown">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">ADMIN <span class="caret"></span></a>
-						<ul class="dropdown-menu" role="menu">
-							<li><a href="idVerification.php">ID VERIFICATION</a></li>
-							<li><a href="shopApproval.php">SHOP APPROVAL</a></li>
-							<li class="disabled"><a href="#">REPORT</a></li>
-							<li><a href="blockedUser.php">BLOCKED USER</a></li>
-						</ul>
-					</li>
 				</ul>
 			</div>
 		</div>

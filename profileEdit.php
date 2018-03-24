@@ -33,7 +33,7 @@ else
 		else if($row['user_status'] == 'BLOCKED')
 			{	$label = 'label-primary';}
 		else if($row['user_status'] == 'ADMIN')
-			{	$label = 'label-info';}		
+			{	$label = 'label-info';}	
 
 		//profileEdit
 		if(isset($_POST['profileEditBtn']))
@@ -214,6 +214,20 @@ else
 			<div class="nav navbar-nav navbar-right <?php if (isset($_SESSION['authenticated'])){echo 'col-md-3';}else{echo 'col-md-2';}?> col-sm-4 navbar-collapse collapse" id="bs-example-navbar-collapse-1">
 				<ul class="nav navbar-nav">
 					<li><a href="home.php" >HOME</a></li>
+					<?php
+					if($row['user_status'] == 'ADMIN')
+					{							
+						echo '<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">ADMIN <span class="caret"></span></a>
+								<ul class="dropdown-menu" role="menu">
+									<li><a href="idVerification.php">ID VERIFICATION</a></li>
+									<li><a href="shopApproval.php">SHOP APPROVAL</a></li>
+									<li><a href="report.php">REPORT</a></li>
+									<li><a href="blockedUser.php">BLOCKED USER</a></li>
+								</ul>
+							</li>';
+					}
+					?>
 					<li><a href="logout.php">LOGOUT</a></li>
 				</ul>
 			</div>
@@ -248,18 +262,6 @@ else
 					<?php
 					if (isset($_SESSION['verified'])) {
 						echo '<li><a href="division.php?division_id=SHOP">SHOP</a></li>';
-					}
-					if($row['user_status'] == 'ADMIN')
-					{							
-						echo '<li class="dropdown">
-							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">ADMIN <span class="caret"></span></a>
-								<ul class="dropdown-menu" role="menu">
-									<li><a href="idVerification.php">ID VERIFICATION</a></li>
-									<li><a href="shopApproval.php">SHOP APPROVAL</a></li>
-									<li><a href="report.php">REPORT</a></li>
-									<li><a href="blockedUser.php">BLOCKED USER</a></li>
-								</ul>
-							</li>';
 					}
 					?>
 				</ul>
