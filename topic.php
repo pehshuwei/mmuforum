@@ -236,7 +236,7 @@ else
 				<div class="panel panel-default">
 					<div class="panel-body text">
 						<h2><?php echo nl2br($row_topic['topic_title']);?></h2>
-						<p><img src="data:image;base64,<?php echo $row_topic['topic_img'];?>" height="300px"/></p>
+						<p><img src="<?php if($row_topic['topic_img']){echo 'data:image;base64,'.$row_topic['topic_img'];}else{ echo '';} ?>" height="300px"/></p>
 						<blockquote><p><?php echo nl2br($row_topic['topic_desc']);?></p></blockquote>						
 						<?php 
 						if($division_id=="SHOP")
