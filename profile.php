@@ -242,7 +242,7 @@ else
 									<td><span class="label <?php echo $label; ?>"><?php echo $row_profile['user_status'];?></span></td>
 								</tr>
 								<tr>
-									<th>POSTS</th>
+									<th>TOPICS</th>
 									<td>|</td>
 									<td><?php echo $topic_num;?></td>
 								</tr>

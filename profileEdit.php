@@ -364,7 +364,7 @@ else
 									<?php 
 									if($row['user_status']=='VISITOR')
 									{
-										echo '<a href="changeStatus.php" target="_blank" rel="noopener">Change status</a>
+										echo '<a href="changeStatus.php">Change status</a>
 											<p class="text-info">____________________
 											<br>Why have to change status?
 											<br>With status <span class="label label-default">VISITOR</span>, you can only create topics and comments.
